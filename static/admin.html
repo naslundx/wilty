@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>System Administration Panel</title>
+        <link rel="stylesheet" href="/style.css" />
+        <style>
+            body {
+                max-width: 950px;
+            }
+            .badge {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .badge-waiting {
+                background-color: #fef3c7;
+                color: #d97706;
+            }
+            .badge-playing {
+                background-color: #dbeafe;
+                color: #2563eb;
+            }
+            .badge-finished {
+                background-color: #d1fae5;
+                color: #059669;
+            }
+            .badge-system {
+                background-color: #e2e8f0;
+                color: #475569;
+            }
+            .badge-user {
+                background-color: #f5f3ff;
+                color: #7c3aed;
+            }
+            .vote-count {
+                font-weight: bold;
+                font-family: monospace;
+            }
+            .vote-up {
+                color: var(--success);
+            }
+            .vote-down {
+                color: var(--danger);
+            }
+        </style>
+    </head>
+    <body>
+        <h1>System Database Console</h1>
+        <p style="text-align: center; color: #64748b; margin-top: -10px">
+            Real-time overview of games, players, and prompt feedback metrics.
+        </p>
+
+        <div style="text-align: center; margin-bottom: 20px">
+            <button
+                onclick="loadDashboardData()"
+                style="width: auto; padding: 8px 16px"
+            >
+                Refresh Dashboard Data
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>Active Game Instances</h2>
+            <table id="admin-games-table">
+                <thead>
+                    <tr>
+                        <th>Game Code</th>
+                        <th>Status</th>
+                        <th>Current Storyteller ID</th>
+                        <th>Active Prompt ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="color: #64748b">
+                            Loading metrics...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Registered Player Directory</h2>
+            <table id="admin-users-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Room Assigned</th>
+                        <th>Nickname</th>
+                        <th>Current Score</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" style="color: #64748b">
+                            Loading metrics...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Statement Bank Summary & Statistics</h2>
+            <table id="admin-statements-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Scope Allocation</th>
+                        <th>Category</th>
+                        <th>Statement Asset Text</th>
+                        <th>Usage State</th>
+                        <th>User Ratings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="color: #64748b">
+                            Loading metrics...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <script src="/admin.js"></script>
+    </body>
+</html>

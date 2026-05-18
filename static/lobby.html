@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Waiting Room</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+        <h1>The Waiting Room</h1>
+        <div class="card">
+            <p>Share this Room Code with friends:</p>
+            <div
+                id="lobby-code-display"
+                class="highlight-box"
+                style="font-size: 24px; text-align: center; letter-spacing: 2px"
+            ></div>
+        </div>
+
+        <div class="card">
+            <h3>Submit Your Truth Secrets</h3>
+            <p style="font-size: 14px; color: #64748b">
+                These are linked to this game session and will always be
+                included.
+            </p>
+            <div class="flex-group">
+                <input
+                    type="text"
+                    id="statement-input"
+                    placeholder="e.g., I have a third cousin who is a rockstar."
+                />
+                <button
+                    onclick="submitStatement()"
+                    style="width: auto; white-space: nowrap"
+                >
+                    Add Secret
+                </button>
+            </div>
+        </div>
+
+        <div id="creator-config" class="card" style="display: none">
+            <h3>Room System Settings</h3>
+            <p style="font-size: 14px; color: #64748b">
+                Select statement pool categories to include:
+            </p>
+            <div class="checkbox-card">
+                <input type="checkbox" id="cat-casual" value="Casual" checked />
+                <label for="cat-casual"
+                    ><strong>Casual</strong> (Lighthearted/Fun)</label
+                >
+            </div>
+            <div class="checkbox-card">
+                <input
+                    type="checkbox"
+                    id="cat-work"
+                    value="Work & School"
+                    checked
+                />
+                <label for="cat-work"
+                    ><strong>Work & School</strong> (Professional
+                    Mishaps)</label
+                >
+            </div>
+            <div class="checkbox-card">
+                <input type="checkbox" id="cat-adult" value="Adult" />
+                <label for="cat-adult"
+                    ><strong>Adult / Spicy</strong> (Grown-ups only)</label
+                >
+            </div>
+            <br />
+            <button
+                onclick="startGame()"
+                style="background-color: var(--success)"
+            >
+                Launch Game Loop
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Active Connected Players</h3>
+            <ul
+                id="players-list"
+                style="padding-left: 20px; line-height: 2"
+            ></ul>
+        </div>
+        <script src="/lobby.js"></script>
+    </body>
+</html>

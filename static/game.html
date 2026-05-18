@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Game Active</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+        <div id="game-timer" class="timer-banner">Time Remaining: --s</div>
+
+        <div class="card" style="background: #e0e7ff; text-align: center">
+            <h3 id="storyteller-banner" style="margin: 0; color: var(--accent)">
+                Synchronizing active storyteller...
+            </h3>
+        </div>
+
+        <div
+            class="card"
+            style="text-align: center; padding: 40px 20px; position: relative"
+        >
+            <p
+                style="
+                    text-transform: uppercase;
+                    font-size: 12px;
+                    letter-spacing: 1px;
+                    color: #64748b;
+                    margin-top: 0;
+                "
+            >
+                Presented Asserted Fact:
+            </p>
+            <h2 id="statement-display" style="font-style: italic">
+                "Loading content..."
+            </h2>
+
+            <!-- Optional Prompt Utility Feedback Row -->
+            <div
+                id="prompt-rating-region"
+                style="margin-top: 25px; display: none"
+            >
+                <p style="font-size: 12px; color: #64748b; margin-bottom: 5px">
+                    Rate this prompt option:
+                </p>
+                <div style="display: inline-flex; gap: 10px">
+                    <button
+                        id="rate-up-btn"
+                        onclick="ratePrompt('up')"
+                        style="
+                            width: auto;
+                            padding: 6px 12px;
+                            font-size: 13px;
+                            background: #475569;
+                        "
+                    >
+                        Thumbs Up
+                    </button>
+                    <button
+                        id="rate-down-btn"
+                        onclick="ratePrompt('down')"
+                        style="
+                            width: auto;
+                            padding: 6px 12px;
+                            font-size: 13px;
+                            background: #475569;
+                        "
+                    >
+                        Thumbs Down
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guesser Controls Interface -->
+        <div id="guesser-controls" class="card" style="display: none">
+            <h3 style="margin-top: 0">Cast Your Verdict</h3>
+            <div class="flex-group">
+                <button
+                    onclick="submitVote(true)"
+                    style="background-color: var(--success)"
+                >
+                    Truth
+                </button>
+                <button
+                    onclick="submitVote(false)"
+                    style="background-color: var(--danger)"
+                >
+                    Lie
+                </button>
+            </div>
+        </div>
+
+        <!-- Storyteller Evaluation Interface -->
+        <div
+            id="storyteller-controls"
+            class="card"
+            style="display: none; border: 2px solid var(--accent)"
+        >
+            <h3 style="margin-top: 0; color: var(--accent)">
+                You are the Storyteller!
+            </h3>
+            <p>
+                Defend the statement above under questioning. Once
+                cross-examination finishes and conditions are met, reveal
+                reality:
+            </p>
+            <div class="flex-group">
+                <button
+                    id="resolve-true-btn"
+                    onclick="resolveRound(true)"
+                    style="background-color: var(--success)"
+                >
+                    I Told The Truth
+                </button>
+                <button
+                    id="resolve-false-btn"
+                    onclick="resolveRound(false)"
+                    style="background-color: var(--danger)"
+                >
+                    I Was Lying!
+                </button>
+            </div>
+            <p
+                id="storyteller-lock-notice"
+                style="
+                    font-size: 12px;
+                    color: var(--danger);
+                    text-align: center;
+                    margin-top: 10px;
+                    font-weight: 600;
+                "
+            ></p>
+        </div>
+
+        <div class="card">
+            <p
+                id="vote-summary"
+                style="font-weight: 600; text-align: center; color: #475569"
+            ></p>
+            <h3>Live Leaderboard (First to 5 wins)</h3>
+            <table id="score-table"></table>
+        </div>
+        <script src="/game.js"></script>
+    </body>
+</html>

@@ -1,0 +1,26 @@
+const gameId = localStorage.getItem("game_id");
+const userId = localStorage.getItem("user_id");
+
+async function renderFinals() {
+  const res = await fetch(`/api/game/state/${gameId}/${userId}`);
+  const state = await res.json();
+
+  const table = document.getElementById("final-score-table");
+  const sorted = [...state.players].sort((a, b) => b.score - a.score);
+
+  table.innerHTML =
+    `<tr><th>Rank</th><th>Player Name</th><th>Final Score</th></tr>` +
+    sorted
+      .map(
+        (p, idx) =>
+          `<tr><td>#${idx + 1}</td><td>${p.username}</td><td><strong>${p.score} pts</strong></td></tr>`,
+      )
+      .join("");
+}
+
+function returnHome() {
+  localStorage.clear();
+  window.location.href = "/index.html";
+}
+
+renderFinals();

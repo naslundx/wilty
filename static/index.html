@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Would You Lie to Me?</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+        <h1>Would You Lie to Me?</h1>
+        <div class="card">
+            <h3>Identity Settings</h3>
+            <input
+                type="text"
+                id="username-input"
+                placeholder="Enter Nickname"
+            />
+            <hr
+                style="
+                    border: 0;
+                    border-top: 1px solid var(--border);
+                    margin: 20px 0;
+                "
+            />
+            <button onclick="createGame()">Create New Room</button>
+            <div
+                style="
+                    text-align: center;
+                    margin: 15px;
+                    font-weight: 600;
+                    color: #64748b;
+                "
+            >
+                OR
+            </div>
+            <input
+                type="text"
+                id="game-id-input"
+                placeholder="Enter 5 Character Room Code"
+            />
+            <button onclick="joinGame()" class="btn-alt">
+                Join Existing Room
+            </button>
+        </div>
+        <script src="/auth.js"></script>
+    </body>
+</html>
