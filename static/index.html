@@ -2,45 +2,46 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Would You Lie to Me?</title>
         <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
         <h1>Would You Lie to Me?</h1>
-        <div class="card">
-            <h3>Identity Settings</h3>
-            <input
-                type="text"
-                id="username-input"
-                placeholder="Enter Nickname"
-            />
-            <hr
-                style="
-                    border: 0;
-                    border-top: 1px solid var(--border);
-                    margin: 20px 0;
-                "
-            />
-            <button onclick="createGame()">Create New Room</button>
-            <div
-                style="
-                    text-align: center;
-                    margin: 15px;
-                    font-weight: 600;
-                    color: #64748b;
-                "
-            >
-                OR
+        <input
+            type="text"
+            id="username-input"
+            class="nickname-input"
+            placeholder="Enter Nickname"
+        />
+        <div class="options-row">
+            <div class="option-card">
+                <button onclick="createGame()">Create New Room</button>
             </div>
-            <input
-                type="text"
-                id="game-id-input"
-                placeholder="Enter 5 Character Room Code"
-            />
-            <button onclick="joinGame()" class="btn-alt">
-                Join Existing Room
-            </button>
+            <div class="option-card">
+                <input
+                    type="text"
+                    id="game-id-input"
+                    maxlength="5"
+                    placeholder="Enter 5 Character Room Code"
+                    style="text-align: center; text-transform: uppercase"
+                    oninput="validateRoomCode()"
+                />
+                <button
+                    onclick="joinGame()"
+                    class="btn-alt"
+                    id="join-btn"
+                    disabled
+                >
+                    Join Existing Room
+                </button>
+            </div>
         </div>
+        <div class="about-text">
+            A party game of truth, lies, and deduction. Gather your friends and
+            see who can spot the fib!
+        </div>
+        <div class="copyright">New Generation Softwares &copy; 2026</div>
         <script src="/auth.js"></script>
     </body>
 </html>

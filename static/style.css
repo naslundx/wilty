@@ -8,6 +8,14 @@
     --danger: #ef4444;
     --border: #e2e8f0;
 }
+
+/* Base resets adjusted for mobile viewport boundaries */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family:
         "Inter",
@@ -17,116 +25,238 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-main);
     max-width: 650px;
-    margin: 40px auto;
-    padding: 20px;
+    margin: 0 auto;
+    padding: 16px; /* Reduced padding for compact mobile edge screens */
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent; /* Removes default blue tap box on mobile Safari/Chrome */
 }
-h1,
-h2,
-h3 {
+
+h1 {
+    font-size: 1.8rem;
+    margin: 16px 0;
     text-align: center;
     color: #0f172a;
 }
+
+h2 {
+    font-size: 1.4rem;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+h3 {
+    font-size: 1.1rem;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+/* Responsive Cards */
 .card {
     background: var(--card-bg);
-    padding: 24px;
+    padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    width: 100%;
 }
+
+/* Mobile-First Form Control Optimization */
 input[type="text"] {
     width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
+    padding: 14px 12px; /* Increased vertical padding for easier finger tapping */
     border: 2px solid var(--border);
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 16px; /* Crucial: Prevents iOS from auto-zooming inputs on focus */
     transition: border-color 0.2s;
-    margin-bottom: 12px;
+    margin-top: 12px;
+    display: block;
 }
+
 input[type="text"]:focus {
     outline: none;
     border-color: var(--accent);
 }
+
+/* Tap Target Optimization (Minimum 44px height for touch safety) */
 button {
     width: 100%;
+    min-height: 48px;
     padding: 12px;
     font-size: 16px;
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
-        transform 0.1s,
-        background-color 0.2s;
+        background-color 0.2s,
+        transform 0.1s;
     background-color: var(--accent);
     color: white;
 }
-button:hover {
-    background-color: var(--accent-hover);
-    transform: translateY(-1px);
+
+/* Desktop Hover Interaction Guardrails */
+@media (hover: hover) {
+    button:hover {
+        background-color: var(--accent-hover);
+        transform: translateY(-1px);
+    }
 }
+
+button:active {
+    transform: scale(0.98);
+}
+
 button:disabled {
-    background-color: #cbd5e1;
+    background-color: #cbd5e1 !important;
+    color: #94a3b8 !important;
     cursor: not-allowed;
-    transform: none;
+    transform: none !important;
 }
+
 .btn-alt {
     background-color: transparent;
     color: var(--accent);
     border: 2px solid var(--accent);
 }
-.btn-alt:hover {
-    background-color: #f5f3ff;
+
+@media (hover: hover) {
+    .btn-alt:hover {
+        background-color: #f5f3ff;
+    }
 }
+
 .btn-danger {
     background-color: var(--danger);
 }
-.btn-danger:hover {
-    background-color: #dc2626;
+
+@media (hover: hover) {
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
 }
+
+/* Flexible Action Groups */
 .flex-group {
     display: flex;
-    gap: 10px;
+    flex-direction: row;
+    gap: 12px;
     align-items: center;
-    margin: 10px 0;
+    margin: 12px 0;
+    width: 100%;
 }
+
+/* Checkbox Cards scaled for thumbs */
 .checkbox-card {
     background: #f1f5f9;
-    padding: 12px;
+    padding: 14px;
     border-radius: 8px;
     margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
+
+.checkbox-card input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.checkbox-card label {
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Text Containers */
 .highlight-box {
     background: #eff6ff;
     border-left: 4px solid var(--accent);
-    padding: 12px;
+    padding: 14px;
     border-radius: 4px;
     word-break: break-all;
     font-family: monospace;
+    font-size: 1.1rem;
 }
+
 .timer-banner {
     background-color: #fff7ed;
     border: 1px solid #ffedd5;
     color: #c2410c;
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
+    font-size: 15px;
 }
+
+/* Responsive Tables & Scoreboards */
 table {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 12px;
     border-collapse: collapse;
 }
+
 th,
 td {
-    padding: 12px;
+    padding: 12px 8px;
     border-bottom: 1px solid var(--border);
     text-align: left;
+    font-size: 14px;
 }
+
 th {
     background-color: #f1f5f9;
     font-weight: 600;
+}
+
+/* Admin Specific Panel Adjustments */
+body[style*="max-width: 950px"],
+.admin-body {
+    max-width: 950px !important;
+}
+
+/* --- MOBILE SPECIFIC OVERRIDES --- */
+@media (max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    /* Stack flex elements vertically on narrow viewports */
+    .flex-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .flex-group button {
+        width: 100%;
+    }
+
+    /* Prevent massive data tables from blowing out mobile screen widths */
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth kinetic scrolling on iOS */
+    }
+
+    th,
+    td {
+        padding: 10px 6px;
+        font-size: 13px;
+    }
 }

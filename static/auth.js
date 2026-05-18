@@ -40,3 +40,10 @@ async function joinGame() {
   localStorage.setItem("user_id", data.user_id);
   window.location.href = "/lobby.html";
 }
+
+function validateRoomCode() {
+  const input = document.getElementById("game-id-input");
+  const btn = document.getElementById("join-btn");
+  const val = input.value.trim();
+  btn.disabled = !/^([a-zA-Z0-9]{5})$/.test(val);
+}

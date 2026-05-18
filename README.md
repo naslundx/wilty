@@ -1,89 +1,99 @@
-# Would You Lie to Me? 🤥
+WOULD YOU LIE TO ME?
 
-A minimalist, framework-free multiplayer party game inspired by the hit TV show. Players submit true secrets, cross-examine a randomly selected storyteller, and vote on whether they are telling the truth or lying.
+A minimalist multiplayer party game inspired by the television show concept. Players submit true secrets, cross-examine a randomly selected storyteller, and vote on whether the presented statement is a truth or a lie.
+========================================================================
+CORE GAME FEATURES
 
----
+    Alphanumeric Room Codes: Rooms use a clean, 5-character uppercase alphanumeric identifier for easy sharing.
 
-## 🛠️ Technology Stack
+    Preparation Delay: Guessers experience a 5-second blind delay at the start of each round, giving the storyteller time to prepare their pitch before the statement is revealed to the room.
 
-*   **Backend:** Python 3.12+, FastAPI, Uvicorn
-*   **Database:** SQLite (Persistent `game.db` with automatic schema & seed generation)
-*   **Frontend:** Vanilla HTML5, CSS3 (Custom design system), modern Vanilla JavaScript (ES6+)
-*   **Package/Environment Management:** `uv` (Extremely fast Python package installer and resolver)
+    Strategic Action Locking: The storyteller cannot resolve the round until all guessers have submitted their verdicts, or the 60-second round timer expires.
 
----
+    Prompt Ratings: Players can optionally vote thumbs up or thumbs down once per statement to gather data on the best prompts.
 
-## 📁 Project Structure
+    Central Admin Console: A dedicated management dashboard provides real-time oversight of all live games, player scoring nodes, and global prompt feedback statistics.
 
-```text
-├── main.py            # FastAPI application, routing, and game loop logic
-├── schema.sql         # Core relational database tables
-├── content.sql        # Pre-seeded global statements grouped by category
-└── static/            # Asset folder served automatically by the backend
-    ├── style.css      # Unified application stylesheet
-    ├── index.html     # Authentication / Landing page
-    ├── auth.js        # Session & authentication handler
-    ├── lobby.html     # Room management & configuration interface
-    ├── lobby.js       # Category management & polling logic
-    ├── game.html      # Active gameplay arena & scoreboards
-    ├── game.js        # Core game-loop controller
-    ├── finished.html  # Game-over podium rankings
-    └── finished.js    # Session-end teardown controller
+========================================================================
+PROJECT STRUCTURE
 
+config.py          Central system thresholds, limits, and timing rules
+engine.py          Database initialization, room code generation, and round transitions
+main.py            FastAPI application routing, state machines, and admin API endpoints
+schema.sql         Database schema structure including prompts and rating tables
+content.sql        Pre-seeded global fallback statement pools divided by category
+static/            Frontend static assets served natively by the backend
+style.css      Unified design system stylesheet
+index.html     Landing authentication gate
+auth.js        Session enrollment and room entry controller
+lobby.html     Room lobby configuration page
+lobby.js       Category configuration and lobby pooling controller
+game.html      Active gameplay arena, feedback options, and timers
+game.js        Active game state runner, rating engine, and voting router
+finished.html  Game over screen
+finished.js    Session termination engine
+admin.html     System dashboard panel view
+admin.js       Live diagnostic table compiler
+========================================================================
+LOCAL SETUP (USING UV)
 
-# 🚀 Getting Started (Using uv)
+This project leverages uv for high-speed package resolving and environment management.
 
-This project utilizes uv for lightning-fast workspace initialization.
-1. Prerequisites
+    Project Environment Initialization
 
-Ensure you have uv installed. If not, install it via curl or pip:
-Bash
+Initialize your local environment and install the required asynchronous runtime dependencies:
 
-# macOS/Linux
-curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
-
-# Windows (PowerShell)
-powershell -c "irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex"
-
-2. Environment Setup
-
-Clone or navigate to your project directory, then create a virtual environment and install dependencies natively with uv:
-Bash
-
-# Create a virtual environment
+Create a virtual environment:
 uv venv
 
-# Activate the environment
-# On macOS/Linux:
-source .venv/bin/activate
-# On Windows:
-.venv\Scripts\activate
+Activate the virtual environment:
+On macOS/Linux: source .venv/bin/activate
+On Windows: .venv\Scripts\activate
 
-# Install the lightweight runtime dependencies
+Install runtime dependencies:
 uv pip install fastapi uvicorn
 
-🏃‍♂️ How to Run & Test
-1. Start the Server
+    Execution
 
-Run the application using Uvicorn. The backend automatically reads schema.sql and content.sql to generate a local game.db file if it doesn't already exist.
-Bash
+Launch the local development engine using Uvicorn. On its first initialization, the application will automatically read your schema and content files to generate a persistent local game.db file.
 
-uv run uvicorn main.py:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-2. Access the Application
+Main Application Interface: http://localhost:8000
+System Admin Console: http://localhost:8000/admin
+========================================================================
+PRODUCTION DEPLOYMENT TO HEROKU
 
-Open your web browser and navigate to:
-👉 http://localhost:8000
-3. Local Testing Loop (Simulating Multi-player)
+Heroku provides native support for uv environments by auto-detecting your dependency mapping files.
 
-Because the game uses short-polling and isolates state by browser storage tokens, you can fully test the game loop on a single machine:
+    Deployment Requirements
 
-Open Browser Window A (e.g., Chrome Normal Mode) -> Enter a nickname and click Create New Room.
+Ensure the following system components are configured accurately at your root folder:
 
-Copy the full generated Room UUID String from the landing dashboard.
+Procfile: Must contain the exact module path command for the ASGI wrapper:
+web: uvicorn main:app --host 0.0.0.0 --port $PORT
 
-Open Browser Window B (e.g., Chrome Incognito, Firefox, or Safari) -> Enter a different nickname, paste the UUID string, and click Join Existing Room.
+uv.lock and pyproject.toml: Ensure your lockfile is up to date by running "uv lock" locally before committing.
 
-Repeat for as many players as you want to test.
+    Deployment Commands
 
-Control the room settings and categories from the host window (Window A) and click Launch Game Loop to begin.
+Execute the following terminal workflow to sync your codebase with your Heroku app remote (assuming your app is named wilty):
+
+Initialize git and stage all project files:
+git init
+git add main.py engine.py config.py schema.sql content.sql static/ Procfile pyproject.toml uv.lock .gitignore
+git commit -m "Deploying game natively with uv tracking"
+
+Link to your existing Heroku application target:
+heroku git:remote -a wilty
+
+Push changes to deploy:
+git push heroku main
+
+To review system traffic or confirm configuration status during live match execution, tail the environment log outputs:
+
+heroku logs --tail
+
+
+things to do
+-
