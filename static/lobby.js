@@ -53,6 +53,16 @@ const interval = setInterval(pollLobby, 2000);
 let currentNumberOfPlayers = 1;
 pollLobby();
 
+// Bind Enter key on statement input
+const statementInput = document.getElementById("statement-input");
+if (statementInput) {
+  statementInput.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+      submitStatement();
+    }
+  });
+}
+
 function clearSessionAndRedirect() {
   clearInterval(interval);
   localStorage.removeItem("game_id");
@@ -109,7 +119,8 @@ async function pollLobby() {
 
 async function submitStatement() {
   const input = document.getElementById("statement-input");
-  if (!input.value.trim()) {
+  const text = input.value.trim();
+  if (!text) {
     return;
   }
   await fetch("/api/game/statement", {
@@ -118,15 +129,22 @@ async function submitStatement() {
     body: JSON.stringify({
       game_id: gameId,
       user_id: userId,
-      text: input.value.trim(),
+      text: text,
     }),
   });
   input.value = "";
+  alert("Secret statement successfully added to your room's custom pool!");
 }
 
 async function startGame() {
   if (currentNumberOfPlayers < 2) {
-    alert("You need someone to play with!");
+    return alert("You need someone to play with!");
+  }
+
+  const startBtn = document.querySelector("button[onclick='startGame()']");
+  if (startBtn) {
+    startBtn.disabled = true;
+    startBtn.innerText = "Starting Match...";
   }
 
   const categories = [];
@@ -140,13 +158,25 @@ async function startGame() {
     categories.push("Adult");
   }
 
-  const res = await fetch("/api/game/start", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ game_id: gameId, user_id: userId, categories }),
-  });
-  if (!res.ok) {
-    alert((await res.json()).detail);
+  try {
+    const res = await fetch("/api/game/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId, categories }),
+    });
+    if (!res.ok) {
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.innerText = "Start!";
+      }
+      alert((await res.json()).detail);
+    }
+  } catch {
+    if (startBtn) {
+      startBtn.disabled = false;
+      startBtn.innerText = "Start!";
+    }
+    alert("Connection error. Failed to start game.");
   }
 }
 

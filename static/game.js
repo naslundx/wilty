@@ -240,11 +240,21 @@ async function endGame() {
 }
 
 async function submitVote(val) {
-  await fetch("/api/game/vote", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ game_id: gameId, user_id: userId, vote: val }),
-  });
+  const guesserBox = document.getElementById("guesser-controls");
+  if (guesserBox) {
+    guesserBox.innerHTML =
+      "<p style='text-align:center; font-weight:600; color:var(--accent);'>Logging your choice...</p>";
+  }
+
+  try {
+    await fetch("/api/game/vote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId, vote: val }),
+    });
+  } catch {
+    alert("Connection error. Failed to log vote.");
+  }
   pollGame();
 }
 
@@ -268,17 +278,42 @@ async function ratePrompt(type) {
 }
 
 async function resolveRound(actual) {
-  const res = await fetch("/api/game/resolve", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      game_id: gameId,
-      user_id: userId,
-      actual_truth: actual,
-    }),
-  });
-  if (!res.ok) {
-    alert((await res.json()).detail);
+  const trueBtn = document.getElementById("resolve-true-btn");
+  const falseBtn = document.getElementById("resolve-false-btn");
+  if (trueBtn) {
+    trueBtn.disabled = true;
+  }
+  if (falseBtn) {
+    falseBtn.disabled = true;
+  }
+
+  try {
+    const res = await fetch("/api/game/resolve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        game_id: gameId,
+        user_id: userId,
+        actual_truth: actual,
+      }),
+    });
+    if (!res.ok) {
+      alert((await res.json()).detail);
+      if (trueBtn) {
+        trueBtn.disabled = false;
+      }
+      if (falseBtn) {
+        falseBtn.disabled = false;
+      }
+    }
+  } catch {
+    if (trueBtn) {
+      trueBtn.disabled = false;
+    }
+    if (falseBtn) {
+      falseBtn.disabled = false;
+    }
+    alert("Connection error. Failed to resolve round.");
   }
   pollGame();
 }

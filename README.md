@@ -112,18 +112,4 @@ heroku logs --tail
 
 ## Things to Do
 
-- [ ] Add Font Awesome and use icons instead of text "thumbs up"/"thumbs down", and less prominent buttons
-- [ ] Make the time banner smaller and use clock icon
-- [ ] When time reaches 0, flash (but nothing happens to the game)
-- [ ] On game creation, make it possible to select max time in minutes (or no timer) - update clients accordingly
-- [ ] Show leaderboard only between game rounds - otherwise hide it. Show it on final page once game over.
-- [ ] End the game after max number of rounds (default number of players * 2) - configurable on game creation
-- [ ] Make winning number of points configurable by game creator.
-- [ ] Add button for joiner to leave game - resets local storage in frontend and marks this player as will never be chosen. If that player is storyteller, jump to another.
-- [ ] Add button for creator to end game. Ends for everyone. Must have confirmation.
-- [ ] Replace all alerts with a more convenient notification, either on the specific form element or as a banner at the top.
-- [ ] Add more statements
-- [ ] Allow editing the existing statements from the admin page
-- [ ] Set proper titles for each page
-- [ ] Edit URLs to access so it's enough to go to `/lobby`, not `/lobby.html`
-- [ ] Auto deploy to Heroku on merge to `main` on GitHub
+- ...
