@@ -1,6 +1,8 @@
 window.alert = function (message) {
   const existing = document.getElementById("app-alert-banner");
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const banner = document.createElement("div");
   banner.id = "app-alert-banner";
@@ -40,6 +42,8 @@ window.alert = function (message) {
   }, 4000);
 };
 
+let statementsData = [];
+
 window.onload = () => {
   loadDashboardData();
 };
@@ -47,8 +51,12 @@ window.onload = () => {
 async function loadDashboardData() {
   try {
     const res = await fetch("/api/admin/dashboard");
-    if (!res.ok) throw new Error("Could not access admin metrics.");
+    if (!res.ok) {
+      throw new Error("Could not access admin metrics.");
+    }
     const data = await res.json();
+
+    statementsData = data.statements;
 
     renderGamesTable(data.games);
     renderUsersTable(data.users);
@@ -103,7 +111,7 @@ function renderUsersTable(users) {
 function renderStatementsTable(statements) {
   const tbody = document.querySelector("#admin-statements-table tbody");
   if (statements.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b;">Statement system registry completely empty.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">Statement system registry completely empty.</td></tr>`;
     return;
   }
 
@@ -128,8 +136,115 @@ function renderStatementsTable(statements) {
                     <span class="vote-count vote-up">+${ups}</span> /
                     <span class="vote-count vote-down">-${downs}</span>
                 </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="editStatementById(${s.id})" style="width: auto; min-height: auto; padding: 6px 10px; font-size: 13px; background-color: var(--accent);"><i class="fa fa-pencil"></i></button>
+                        <button onclick="deleteStatement(${s.id})" style="width: auto; min-height: auto; padding: 6px 10px; font-size: 13px; background-color: var(--danger);"><i class="fa fa-trash"></i></button>
+                    </div>
+                </td>
             </tr>
         `;
     })
     .join("");
+}
+
+function showAddForm() {
+  document.getElementById("form-title").innerText = "Add New Statement";
+  document.getElementById("form-statement-id").value = "";
+  document.getElementById("form-text").value = "";
+  document.getElementById("form-category").value = "Casual";
+  document.getElementById("form-game-id").value = "";
+  document.getElementById("form-used").checked = false;
+
+  const card = document.getElementById("statement-form-card");
+  card.style.display = "block";
+  card.scrollIntoView({ behavior: "smooth" });
+}
+
+function editStatementById(id) {
+  const s = statementsData.find((item) => item.id === id);
+  if (!s) {
+    return;
+  }
+
+  document.getElementById("form-title").innerText = `Edit Statement #${s.id}`;
+  document.getElementById("form-statement-id").value = s.id;
+  document.getElementById("form-text").value = s.text;
+  document.getElementById("form-category").value = s.category;
+  document.getElementById("form-game-id").value = s.game_id || "";
+  document.getElementById("form-used").checked = !!s.used;
+
+  const card = document.getElementById("statement-form-card");
+  card.style.display = "block";
+  card.scrollIntoView({ behavior: "smooth" });
+}
+
+function cancelStatementForm() {
+  document.getElementById("statement-form-card").style.display = "none";
+}
+
+async function saveStatement(event) {
+  event.preventDefault();
+
+  const idVal = document.getElementById("form-statement-id").value;
+  const id = idVal ? parseInt(idVal) : null;
+  const text = document.getElementById("form-text").value.trim();
+  const category = document.getElementById("form-category").value;
+  const gameId = document.getElementById("form-game-id").value.trim();
+  const used = document.getElementById("form-used").checked;
+
+  if (!text) {
+    return alert("Statement text is required!");
+  }
+
+  try {
+    const res = await fetch("/api/admin/statement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        text,
+        category,
+        game_id: gameId || null,
+        used,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.detail || "Error saving statement asset.");
+      return;
+    }
+
+    cancelStatementForm();
+    await loadDashboardData();
+    alert("Statement asset successfully saved!");
+  } catch (err) {
+    console.error(err);
+    alert("Error communicating with server.");
+  }
+}
+
+async function deleteStatement(id) {
+  if (
+    confirm(`Are you sure you want to permanently delete Statement #${id}?`)
+  ) {
+    try {
+      const res = await fetch(`/api/admin/statement/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.detail || "Error deleting statement asset.");
+        return;
+      }
+
+      await loadDashboardData();
+      alert("Statement asset successfully deleted!");
+    } catch (err) {
+      console.error(err);
+      alert("Error communicating with server.");
+    }
+  }
 }

@@ -119,6 +119,19 @@ else
     echo "✅ JavaScript Linting passed."
 fi
 
+# --- CSS Checks (using stylelint) ---
+echo -e "\n--- [CSS] Checking Linting & Styling ---"
+echo "Checking CSS with stylelint..."
+npx stylelint "static/**/*.css"
+CSS_LINT_EXIT=$?
+
+if [ $CSS_LINT_EXIT -ne 0 ]; then
+    echo "❌ CSS Linting failed!"
+    FAILED=1
+else
+    echo "✅ CSS Linting passed."
+fi
+
 echo "=========================================================="
 if [ $FAILED -ne 0 ]; then
     echo "❌ Some checks failed. Review the output above."

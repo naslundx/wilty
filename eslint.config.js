@@ -21,7 +21,11 @@ export default [
         rules: {
             "no-unused-vars": "off",
             "no-console": "off",
-            "no-undef": "error"
+            "no-undef": "error",
+            "eqeqeq": "error",
+            "curly": "error",
+            "no-var": "error",
+            "prefer-const": "error"
         }
     }
 ];

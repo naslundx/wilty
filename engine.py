@@ -1,8 +1,9 @@
 import os
-import sqlite3
 import random
+import sqlite3
 import string
 import time
+
 import config
 
 
@@ -17,9 +18,9 @@ class GameEngine:
     def init_db(self):
         if self.db_is_new:
             print("Initializing backend storage components...")
-            with open("schema.sql", "r") as f:
+            with open("schema.sql") as f:
                 self.conn.executescript(f.read())
-            with open("content.sql", "r") as f:
+            with open("content.sql") as f:
                 self.conn.executescript(f.read())
             self.conn.commit()
 

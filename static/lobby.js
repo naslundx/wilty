@@ -1,6 +1,8 @@
 window.alert = function (message) {
   const existing = document.getElementById("app-alert-banner");
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const banner = document.createElement("div");
   banner.id = "app-alert-banner";
@@ -42,10 +44,12 @@ window.alert = function (message) {
 
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
-if (!gameId || !userId) window.location.href = "/index.html";
+if (!gameId || !userId) {
+  window.location.href = "/index.html";
+}
 
 document.getElementById("lobby-code-display").innerText = gameId;
-let interval = setInterval(pollLobby, 2000);
+const interval = setInterval(pollLobby, 2000);
 let currentNumberOfPlayers = 1;
 pollLobby();
 
@@ -63,7 +67,9 @@ async function pollLobby() {
       clearSessionAndRedirect();
       return;
     }
-    if (!res.ok) return;
+    if (!res.ok) {
+      return;
+    }
     const state = await res.json();
 
     if (state.status === "playing") {
@@ -96,14 +102,16 @@ async function pollLobby() {
     list.innerHTML = state.players
       .map((p) => `<li>${p.username} ${p.is_creator ? "(Host)" : ""}</li>`)
       .join("");
-  } catch (e) {
+  } catch {
     console.warn("Lobby sync interrupted...");
   }
 }
 
 async function submitStatement() {
   const input = document.getElementById("statement-input");
-  if (!input.value.trim()) return;
+  if (!input.value.trim()) {
+    return;
+  }
   await fetch("/api/game/statement", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -122,17 +130,24 @@ async function startGame() {
   }
 
   const categories = [];
-  if (document.getElementById("cat-casual").checked) categories.push("Casual");
-  if (document.getElementById("cat-work").checked)
+  if (document.getElementById("cat-casual").checked) {
+    categories.push("Casual");
+  }
+  if (document.getElementById("cat-work").checked) {
     categories.push("Work & School");
-  if (document.getElementById("cat-adult").checked) categories.push("Adult");
+  }
+  if (document.getElementById("cat-adult").checked) {
+    categories.push("Adult");
+  }
 
   const res = await fetch("/api/game/start", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ game_id: gameId, user_id: userId, categories }),
   });
-  if (!res.ok) alert((await res.json()).detail);
+  if (!res.ok) {
+    alert((await res.json()).detail);
+  }
 }
 
 async function leaveGame() {

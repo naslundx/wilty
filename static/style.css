@@ -255,6 +255,10 @@ th {
     font-weight: 600;
 }
 
+tr:hover {
+    background-color: #f8fafc;
+}
+
 /* Admin Specific Panel Adjustments */
 body[style*="max-width: 950px"],
 .admin-body {

@@ -1,6 +1,8 @@
 window.alert = function (message) {
   const existing = document.getElementById("app-alert-banner");
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const banner = document.createElement("div");
   banner.id = "app-alert-banner";
@@ -42,10 +44,12 @@ window.alert = function (message) {
 
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
-if (!gameId || !userId) window.location.href = "/";
+if (!gameId || !userId) {
+  window.location.href = "/";
+}
 
 let currentStatementId = null;
-let interval = setInterval(pollGame, 1000); // Poll faster to update the timer smoothly
+const interval = setInterval(pollGame, 1000); // Poll faster to update the timer smoothly
 pollGame();
 
 function clearSessionAndRedirect() {
@@ -62,7 +66,9 @@ async function pollGame() {
       clearSessionAndRedirect();
       return;
     }
-    if (!res.ok) return;
+    if (!res.ok) {
+      return;
+    }
 
     const state = await res.json();
 
@@ -198,7 +204,7 @@ async function pollGame() {
         document.getElementById("leave-game-btn").style.display = "block";
       }
     }
-  } catch (error) {
+  } catch {
     console.warn("Gameplay sync connection dropped...");
   }
 }
@@ -243,7 +249,9 @@ async function submitVote(val) {
 }
 
 async function ratePrompt(type) {
-  if (!currentStatementId) return;
+  if (!currentStatementId) {
+    return;
+  }
   const res = await fetch("/api/game/rate_prompt", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

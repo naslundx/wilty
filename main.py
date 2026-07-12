@@ -1,12 +1,12 @@
 import sqlite3
 import time
 import uuid
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List, Optional
 
 import config
 from engine import engine
@@ -27,7 +27,7 @@ class CreateGameReq(BaseModel):
     username: str
     max_time_limit: int = 60
     win_score: int = 5
-    max_rounds: Optional[int] = None
+    max_rounds: int | None = None
 
 
 class JoinGameReq(BaseModel):
@@ -44,7 +44,7 @@ class StatementReq(BaseModel):
 class StartGameReq(BaseModel):
     game_id: str
     user_id: str
-    categories: List[str]
+    categories: list[str]
 
 
 class VoteReq(BaseModel):
@@ -73,6 +73,14 @@ class LeaveGameReq(BaseModel):
 class EndGameReq(BaseModel):
     game_id: str
     user_id: str
+
+
+class AdminStatementReq(BaseModel):
+    id: int | None = None
+    text: str
+    category: str
+    game_id: str | None = None
+    used: bool = False
 
 
 # --- Routes ---
@@ -153,7 +161,7 @@ def start_game(req: StartGameReq):
     if req.categories:
         placeholders = ",".join(["?"] * len(req.categories))
         query = f"INSERT INTO statements (game_id, user_id, text, category) SELECT ?, NULL, text, category FROM statements WHERE game_id IS NULL AND category IN ({placeholders})"
-        cursor.execute(query, [req.game_id] + req.categories)
+        cursor.execute(query, [req.game_id, *req.categories])
 
     cursor.execute(
         "SELECT COUNT(*) as count FROM statements WHERE game_id = ?", (req.game_id,)
@@ -264,10 +272,10 @@ def rate_prompt(req: RatePromptReq):
             (req.statement_id, req.user_id, req.rating),
         )
         engine.commit()
-    except sqlite3.IntegrityError:
+    except sqlite3.IntegrityError as err:
         raise HTTPException(
             status_code=400, detail="You have already rated this statement prompt."
-        )
+        ) from err
     return {"status": "rated"}
 
 
@@ -418,6 +426,35 @@ def get_admin_dashboard():
     statements = [dict(row) for row in cursor.fetchall()]
 
     return {"games": games, "users": users, "statements": statements}
+
+
+@app.post("/api/admin/statement")
+def save_admin_statement(req: AdminStatementReq):
+    cursor = engine.get_cursor()
+    game_id = (
+        req.game_id.strip().upper() if req.game_id and req.game_id.strip() else None
+    )
+
+    if req.id:
+        cursor.execute(
+            "UPDATE statements SET text = ?, category = ?, game_id = ?, used = ? WHERE id = ?",
+            (req.text, req.category, game_id, 1 if req.used else 0, req.id),
+        )
+    else:
+        cursor.execute(
+            "INSERT INTO statements (text, category, game_id, used) VALUES (?, ?, ?, ?)",
+            (req.text, req.category, game_id, 1 if req.used else 0),
+        )
+    engine.commit()
+    return {"status": "success"}
+
+
+@app.delete("/api/admin/statement/{statement_id}")
+def delete_admin_statement(statement_id: int):
+    cursor = engine.get_cursor()
+    cursor.execute("DELETE FROM statements WHERE id = ?", (statement_id,))
+    engine.commit()
+    return {"status": "deleted"}
 
 
 @app.get("/lobby")

@@ -1,6 +1,8 @@
 window.alert = function (message) {
   const existing = document.getElementById("app-alert-banner");
-  if (existing) existing.remove();
+  if (existing) {
+    existing.remove();
+  }
 
   const banner = document.createElement("div");
   banner.id = "app-alert-banner";
@@ -63,7 +65,7 @@ async function renderFinals() {
             `<tr><td>#${idx + 1}</td><td>${p.username}</td><td><strong>${p.score} pts</strong></td></tr>`,
         )
         .join("");
-  } catch (err) {
+  } catch {
     returnHome();
   }
 }

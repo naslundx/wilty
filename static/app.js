@@ -20,7 +20,9 @@ function showScreen(screenId) {
 
 async function createGame() {
   const username = document.getElementById("username-input").value;
-  if (!username) return alert("Enter a username!");
+  if (!username) {
+    return alert("Enter a username!");
+  }
 
   const res = await fetch(`${API_BASE}/game/create`, {
     method: "POST",
@@ -39,7 +41,9 @@ async function createGame() {
 async function joinGame() {
   const username = document.getElementById("username-input").value;
   const inputId = document.getElementById("game-id-input").value;
-  if (!username || !inputId) return alert("Enter both username and game ID!");
+  if (!username || !inputId) {
+    return alert("Enter both username and game ID!");
+  }
 
   const res = await fetch(`${API_BASE}/game/join`, {
     method: "POST",
@@ -62,7 +66,9 @@ async function joinGame() {
 
 async function submitStatement() {
   const input = document.getElementById("statement-input");
-  if (!input.value) return;
+  if (!input.value) {
+    return;
+  }
 
   await fetch(`${API_BASE}/game/statement`, {
     method: "POST",
@@ -110,13 +116,17 @@ async function resolveRound(actualTruth) {
 }
 
 function startPolling() {
-  if (pollInterval) clearInterval(pollInterval);
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
   pollGameData();
   pollInterval = setInterval(pollGameData, 2000);
 }
 
 async function pollGameData() {
-  if (!gameId || !userId) return;
+  if (!gameId || !userId) {
+    return;
+  }
   try {
     const res = await fetch(`${API_BASE}/game/state/${gameId}/${userId}`);
     if (!res.ok) {
@@ -184,7 +194,9 @@ function renderGame(state) {
   } else if (state.status === "finished") {
     showScreen("screen-finished");
     renderScores(state.players, "final-scores-table");
-    if (pollInterval) clearInterval(pollInterval);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+    }
   }
 }
 
@@ -198,7 +210,9 @@ function renderScores(players, tableId) {
 }
 
 function leaveGame() {
-  if (pollInterval) clearInterval(pollInterval);
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
   localStorage.clear();
   gameId = null;
   userId = null;
