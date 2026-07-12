@@ -13,6 +13,8 @@ export default [
                 confirm: "readonly",
                 setInterval: "readonly",
                 clearInterval: "readonly",
+                setTimeout: "readonly",
+                clearTimeout: "readonly",
                 fetch: "readonly"
             }
         },

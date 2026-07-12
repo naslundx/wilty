@@ -1,3 +1,45 @@
+window.alert = function (message) {
+  const existing = document.getElementById("app-alert-banner");
+  if (existing) existing.remove();
+
+  const banner = document.createElement("div");
+  banner.id = "app-alert-banner";
+  banner.innerText = message;
+  banner.style.position = "fixed";
+  banner.style.top = "20px";
+  banner.style.left = "50%";
+  banner.style.transform = "translateX(-50%) translateY(-20px)";
+  banner.style.backgroundColor = "var(--danger)";
+  banner.style.color = "white";
+  banner.style.padding = "14px 24px";
+  banner.style.borderRadius = "8px";
+  banner.style.boxShadow =
+    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
+  banner.style.zIndex = "999999";
+  banner.style.fontWeight = "600";
+  banner.style.fontSize = "15px";
+  banner.style.textAlign = "center";
+  banner.style.minWidth = "280px";
+  banner.style.maxWidth = "90%";
+  banner.style.opacity = "0";
+  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+
+  document.body.appendChild(banner);
+
+  setTimeout(() => {
+    banner.style.opacity = "1";
+    banner.style.transform = "translateX(-50%) translateY(0)";
+  }, 10);
+
+  setTimeout(() => {
+    banner.style.opacity = "0";
+    banner.style.transform = "translateX(-50%) translateY(-20px)";
+    setTimeout(() => {
+      banner.remove();
+    }, 300);
+  }, 4000);
+};
+
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
 if (!gameId || !userId) window.location.href = "/index.html";
@@ -30,9 +72,23 @@ async function pollLobby() {
       return;
     }
 
+    if (state.status === "finished") {
+      clearInterval(interval);
+      window.location.href = "/finished";
+      return;
+    }
+
     const me = state.players.find((p) => p.id === userId);
-    if (me && me.is_creator) {
-      document.getElementById("creator-config").style.display = "block";
+    if (me) {
+      if (me.is_creator) {
+        document.getElementById("creator-config").style.display = "block";
+        document.getElementById("end-game-btn").style.display = "block";
+        document.getElementById("leave-game-btn").style.display = "none";
+      } else {
+        document.getElementById("creator-config").style.display = "none";
+        document.getElementById("end-game-btn").style.display = "none";
+        document.getElementById("leave-game-btn").style.display = "block";
+      }
     }
 
     const list = document.getElementById("players-list");
@@ -77,4 +133,34 @@ async function startGame() {
     body: JSON.stringify({ game_id: gameId, user_id: userId, categories }),
   });
   if (!res.ok) alert((await res.json()).detail);
+}
+
+async function leaveGame() {
+  if (confirm("Are you sure you want to leave the game?")) {
+    const res = await fetch("/api/game/leave", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId }),
+    });
+    if (res.ok) {
+      clearSessionAndRedirect();
+    } else {
+      alert((await res.json()).detail);
+    }
+  }
+}
+
+async function endGame() {
+  if (confirm("Are you sure you want to end the game for everyone?")) {
+    const res = await fetch("/api/game/end", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId }),
+    });
+    if (res.ok) {
+      clearSessionAndRedirect();
+    } else {
+      alert((await res.json()).detail);
+    }
+  }
 }

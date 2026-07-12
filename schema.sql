@@ -3,7 +3,11 @@ CREATE TABLE IF NOT EXISTS games (
     status TEXT DEFAULT 'waiting', -- 'waiting', 'playing', 'finished'
     current_storyteller_id TEXT,
     current_statement_id INTEGER,
-    round_started_at REAL DEFAULT 0.0
+    round_started_at REAL DEFAULT 0.0,
+    max_time_limit INTEGER DEFAULT 60,
+    win_score INTEGER DEFAULT 5,
+    max_rounds INTEGER DEFAULT NULL,
+    current_round INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -12,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT,
     score INTEGER DEFAULT 0,
     is_creator BOOLEAN DEFAULT 0,
+    has_left BOOLEAN DEFAULT 0,
     FOREIGN KEY(game_id) REFERENCES games(id) ON DELETE CASCADE
 );
 

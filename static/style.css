@@ -88,7 +88,7 @@ footer {
 }
 
 /* Mobile-First Form Control Optimization */
-input[type="text"] {
+input[type="text"], select, input[type="number"] {
     width: 100%;
     padding: 14px 12px; /* Increased vertical padding for easier finger tapping */
     border: 2px solid var(--border);
@@ -97,9 +97,10 @@ input[type="text"] {
     transition: border-color 0.2s;
     margin-top: 12px;
     display: block;
+    background-color: var(--card-bg);
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus, select:focus, input[type="number"]:focus {
     outline: none;
     border-color: var(--accent);
 }
@@ -214,12 +215,24 @@ button:disabled {
     background-color: #fff7ed;
     border: 1px solid #ffedd5;
     color: #c2410c;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 6px 14px;
+    border-radius: 6px;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 16px;
-    font-size: 15px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes timer-flash-animation {
+    0%, 100% { background-color: #fff7ed; color: #c2410c; opacity: 1; }
+    50% { background-color: #fee2e2; color: #991b1b; opacity: 0.5; }
+}
+.timer-flash {
+    animation: timer-flash-animation 1s infinite alternate;
+    border-color: #fca5a5 !important;
 }
 
 /* Responsive Tables & Scoreboards */

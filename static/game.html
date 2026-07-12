@@ -4,10 +4,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Would You Lie to Me? - Active Game</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
-        <div id="game-timer" class="timer-banner">Time Remaining: --s</div>
+        <div id="game-timer" class="timer-banner"><i class="fa fa-clock-o"></i> Time Remaining: --s</div>
 
         <div class="card" style="background: #e0e7ff; text-align: center">
             <h3 id="storyteller-banner" style="margin: 0; color: var(--accent)">
@@ -48,24 +49,34 @@
                         onclick="ratePrompt('up')"
                         style="
                             width: auto;
-                            padding: 6px 12px;
-                            font-size: 13px;
-                            background: #475569;
+                            min-height: auto;
+                            padding: 8px 16px;
+                            font-size: 16px;
+                            background-color: #f1f5f9;
+                            color: #475569;
+                            border: 1px solid #cbd5e1;
+                            box-shadow: none;
                         "
+                        title="Thumbs Up"
                     >
-                        Thumbs Up
+                        <i class="fa fa-thumbs-up"></i>
                     </button>
                     <button
                         id="rate-down-btn"
                         onclick="ratePrompt('down')"
                         style="
                             width: auto;
-                            padding: 6px 12px;
-                            font-size: 13px;
-                            background: #475569;
+                            min-height: auto;
+                            padding: 8px 16px;
+                            font-size: 16px;
+                            background-color: #f1f5f9;
+                            color: #475569;
+                            border: 1px solid #cbd5e1;
+                            box-shadow: none;
                         "
+                        title="Thumbs Down"
                     >
-                        Thumbs Down
+                        <i class="fa fa-thumbs-down"></i>
                     </button>
                 </div>
             </div>
@@ -137,8 +148,16 @@
                 id="vote-summary"
                 style="font-weight: 600; text-align: center; color: #475569"
             ></p>
-            <h3>Live Leaderboard (First to 5 wins)</h3>
-            <table id="score-table"></table>
+            <div id="leaderboard-region">
+                <h3 id="leaderboard-title">Live Leaderboard (First to 5 wins)</h3>
+                <table id="score-table"></table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Session Controls</h3>
+            <button id="leave-game-btn" class="btn-danger" onclick="leaveGame()" style="display: none;">Leave Game</button>
+            <button id="end-game-btn" class="btn-danger" onclick="endGame()" style="display: none;">End Game (Creator Only)</button>
         </div>
         <script src="/game.js"></script>
     </body>

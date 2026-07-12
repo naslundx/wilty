@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 import config
 from engine import engine
@@ -25,6 +25,9 @@ app.add_middleware(
 # --- API Models ---
 class CreateGameReq(BaseModel):
     username: str
+    max_time_limit: int = 60
+    win_score: int = 5
+    max_rounds: Optional[int] = None
 
 
 class JoinGameReq(BaseModel):
@@ -62,13 +65,42 @@ class ResolveReq(BaseModel):
     actual_truth: bool
 
 
+class LeaveGameReq(BaseModel):
+    game_id: str
+    user_id: str
+
+
+class EndGameReq(BaseModel):
+    game_id: str
+    user_id: str
+
+
 # --- Routes ---
 @app.post("/api/game/create")
 def create_game(req: CreateGameReq):
+    if req.win_score <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Winning score must be a positive non-zero number.",
+        )
+    if req.max_time_limit < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Max round timer cannot be negative.",
+        )
+    if req.max_rounds is not None and req.max_rounds <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Max rounds limit must be a positive non-zero number.",
+        )
+
     game_id = engine.generate_room_code()
     user_id = str(uuid.uuid4())
     cursor = engine.get_cursor()
-    cursor.execute("INSERT INTO games (id) VALUES (?)", (game_id,))
+    cursor.execute(
+        "INSERT INTO games (id, max_time_limit, win_score, max_rounds) VALUES (?, ?, ?, ?)",
+        (game_id, req.max_time_limit, req.win_score, req.max_rounds),
+    )
     cursor.execute(
         "INSERT INTO users (id, game_id, username, is_creator) VALUES (?, ?, ?, 1)",
         (user_id, game_id, req.username),
@@ -146,7 +178,7 @@ def get_state(game_id: str, user_id: str):
         raise HTTPException(status_code=404, detail="Game not found")
 
     cursor.execute(
-        "SELECT id, username, score, is_creator FROM users WHERE game_id = ?",
+        "SELECT id, username, score, is_creator FROM users WHERE game_id = ? AND has_left = 0",
         (game_id,),
     )
     players = [dict(row) for row in cursor.fetchall()]
@@ -165,7 +197,12 @@ def get_state(game_id: str, user_id: str):
     # Timing calculation rules
     now = time.time()
     elapsed = now - game["round_started_at"]
-    time_remaining = max(0, int(config.ROUND_TIMEOUT_LIMIT - elapsed))
+    max_time_limit = game["max_time_limit"] if game["max_time_limit"] is not None else 0
+
+    if max_time_limit > 0:
+        time_remaining = max(0, int(max_time_limit - elapsed))
+    else:
+        time_remaining = None
 
     # Hide statement from guessers during initial prep delay
     if elapsed < config.PREP_TIME_LIMIT and game["current_storyteller_id"] != user_id:
@@ -194,6 +231,12 @@ def get_state(game_id: str, user_id: str):
         "has_voted": user_vote is not None,
         "total_votes": total_votes,
         "time_remaining": time_remaining,
+        "max_time_limit": max_time_limit,
+        "win_score": game["win_score"]
+        if game["win_score"] is not None
+        else config.WIN_SCORE,
+        "max_rounds": game["max_rounds"],
+        "current_round": game["current_round"],
         "elapsed": elapsed,
         "has_rated_prompt": existing_rating is not None,
     }
@@ -232,14 +275,18 @@ def rate_prompt(req: RatePromptReq):
 def resolve_round(req: ResolveReq):
     cursor = engine.get_cursor()
     cursor.execute(
-        "SELECT current_storyteller_id, current_statement_id, round_started_at FROM games WHERE id = ?",
+        "SELECT current_storyteller_id, current_statement_id, round_started_at, max_time_limit, win_score, max_rounds, current_round FROM games WHERE id = ?",
         (req.game_id,),
     )
     game = cursor.fetchone()
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found.")
     if game["current_storyteller_id"] != req.user_id:
         raise HTTPException(status_code=403, detail="Unauthorized execution handler.")
 
-    cursor.execute("SELECT id FROM users WHERE game_id = ?", (req.game_id,))
+    cursor.execute(
+        "SELECT id FROM users WHERE game_id = ? AND has_left = 0", (req.game_id,)
+    )
     total_players = len(cursor.fetchall())
 
     cursor.execute(
@@ -248,13 +295,15 @@ def resolve_round(req: ResolveReq):
     total_votes = cursor.fetchone()["count"]
 
     elapsed = time.time() - game["round_started_at"]
+    max_time_limit = game["max_time_limit"] if game["max_time_limit"] is not None else 0
 
     # Enforce waiting requirements unless timeout has expired
-    if total_votes < (total_players - 1) and elapsed < config.ROUND_TIMEOUT_LIMIT:
-        raise HTTPException(
-            status_code=400,
-            detail="Cannot resolve yet. Waiting for other responses or timeout.",
-        )
+    if total_votes < (total_players - 1):
+        if max_time_limit == 0 or elapsed < max_time_limit:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot resolve yet. Waiting for other responses or timeout.",
+            )
 
     cursor.execute("SELECT user_id, vote FROM votes WHERE game_id = ?", (req.game_id,))
     for vote in cursor.fetchall():
@@ -266,11 +315,22 @@ def resolve_round(req: ResolveReq):
     cursor.execute(
         "UPDATE statements SET used = 1 WHERE id = ?", (game["current_statement_id"],)
     )
+
     cursor.execute(
-        "SELECT MAX(score) as max_score FROM users WHERE game_id = ?", (req.game_id,)
+        "SELECT MAX(score) as max_score FROM users WHERE game_id = ? AND has_left = 0",
+        (req.game_id,),
+    )
+    max_score = cursor.fetchone()["max_score"] or 0
+
+    win_score_limit = (
+        game["win_score"] if game["win_score"] is not None else config.WIN_SCORE
     )
 
-    if cursor.fetchone()["max_score"] >= config.WIN_SCORE:
+    max_rounds_limit = game["max_rounds"]
+    if not max_rounds_limit:
+        max_rounds_limit = total_players * 2
+
+    if max_score >= win_score_limit or game["current_round"] >= max_rounds_limit:
         cursor.execute(
             "UPDATE games SET status = 'finished' WHERE id = ?", (req.game_id,)
         )
@@ -278,6 +338,64 @@ def resolve_round(req: ResolveReq):
         engine.advance_round(cursor, req.game_id)
     engine.commit()
     return {"status": "resolved"}
+
+
+@app.post("/api/game/leave")
+def leave_game(req: LeaveGameReq):
+    cursor = engine.get_cursor()
+    cursor.execute(
+        "SELECT is_creator FROM users WHERE id = ? AND game_id = ?",
+        (req.user_id, req.game_id),
+    )
+    user = cursor.fetchone()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found in this game.")
+    if user["is_creator"]:
+        raise HTTPException(
+            status_code=400, detail="Room creator cannot leave. They must end the game."
+        )
+
+    cursor.execute("UPDATE users SET has_left = 1 WHERE id = ?", (req.user_id,))
+
+    cursor.execute(
+        "SELECT status, current_storyteller_id FROM games WHERE id = ?", (req.game_id,)
+    )
+    game = cursor.fetchone()
+    if (
+        game
+        and game["status"] == "playing"
+        and game["current_storyteller_id"] == req.user_id
+    ):
+        cursor.execute(
+            "SELECT id FROM users WHERE game_id = ? AND has_left = 0", (req.game_id,)
+        )
+        active_players = cursor.fetchall()
+        if len(active_players) == 0:
+            cursor.execute(
+                "UPDATE games SET status = 'finished' WHERE id = ?", (req.game_id,)
+            )
+        else:
+            engine.advance_round(cursor, req.game_id)
+    engine.commit()
+    return {"status": "left"}
+
+
+@app.post("/api/game/end")
+def end_game(req: EndGameReq):
+    cursor = engine.get_cursor()
+    cursor.execute(
+        "SELECT is_creator FROM users WHERE id = ? AND game_id = ?",
+        (req.user_id, req.game_id),
+    )
+    user = cursor.fetchone()
+    if not user or not user["is_creator"]:
+        raise HTTPException(
+            status_code=403, detail="Only the room host can end the game."
+        )
+
+    cursor.execute("UPDATE games SET status = 'finished' WHERE id = ?", (req.game_id,))
+    engine.commit()
+    return {"status": "ended"}
 
 
 @app.get("/api/admin/dashboard")

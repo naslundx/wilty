@@ -1,3 +1,45 @@
+window.alert = function (message) {
+  const existing = document.getElementById("app-alert-banner");
+  if (existing) existing.remove();
+
+  const banner = document.createElement("div");
+  banner.id = "app-alert-banner";
+  banner.innerText = message;
+  banner.style.position = "fixed";
+  banner.style.top = "20px";
+  banner.style.left = "50%";
+  banner.style.transform = "translateX(-50%) translateY(-20px)";
+  banner.style.backgroundColor = "var(--danger)";
+  banner.style.color = "white";
+  banner.style.padding = "14px 24px";
+  banner.style.borderRadius = "8px";
+  banner.style.boxShadow =
+    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
+  banner.style.zIndex = "999999";
+  banner.style.fontWeight = "600";
+  banner.style.fontSize = "15px";
+  banner.style.textAlign = "center";
+  banner.style.minWidth = "280px";
+  banner.style.maxWidth = "90%";
+  banner.style.opacity = "0";
+  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
+
+  document.body.appendChild(banner);
+
+  setTimeout(() => {
+    banner.style.opacity = "1";
+    banner.style.transform = "translateX(-50%) translateY(0)";
+  }, 10);
+
+  setTimeout(() => {
+    banner.style.opacity = "0";
+    banner.style.transform = "translateX(-50%) translateY(-20px)";
+    setTimeout(() => {
+      banner.remove();
+    }, 300);
+  }, 4000);
+};
+
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
 if (!gameId || !userId) window.location.href = "/";
@@ -33,8 +75,18 @@ async function pollGame() {
     currentStatementId = state.statement_id;
 
     // Render Countdown Timer text
-    document.getElementById("game-timer").innerText =
-      `Time Remaining: ${state.time_remaining}s`;
+    if (state.time_remaining !== null) {
+      const timerEl = document.getElementById("game-timer");
+      timerEl.style.display = "block";
+      timerEl.innerHTML = `<i class="fa fa-clock-o"></i> Time Remaining: ${state.time_remaining}s`;
+      if (state.time_remaining <= 0) {
+        timerEl.classList.add("timer-flash");
+      } else {
+        timerEl.classList.remove("timer-flash");
+      }
+    } else {
+      document.getElementById("game-timer").style.display = "none";
+    }
 
     const currentStoryteller = state.players.find(
       (p) => p.id === state.storyteller_id,
@@ -71,7 +123,8 @@ async function pollGame() {
 
       // Check resolve condition rules (all voted OR timer out)
       const canResolve =
-        state.total_votes >= totalGuessers || state.time_remaining <= 0;
+        state.total_votes >= totalGuessers ||
+        (state.time_remaining !== null && state.time_remaining <= 0);
       const trueBtn = document.getElementById("resolve-true-btn");
       const falseBtn = document.getElementById("resolve-false-btn");
       const notice = document.getElementById("storyteller-lock-notice");
@@ -83,8 +136,12 @@ async function pollGame() {
       } else {
         trueBtn.disabled = true;
         falseBtn.disabled = true;
-        notice.innerText =
-          "Locked. Waiting for all guessers to vote or timer expiration.";
+        if (state.max_time_limit > 0) {
+          notice.innerText =
+            "Locked. Waiting for all guessers to vote or timer expiration.";
+        } else {
+          notice.innerText = "Locked. Waiting for all guessers to vote.";
+        }
       }
     } else {
       document.getElementById("storyteller-controls").style.display = "none";
@@ -117,8 +174,62 @@ async function pollGame() {
             `<tr><td>${p.username} ${p.id === state.storyteller_id ? "(Storyteller)" : ""}</td><td><strong>${p.score} pts</strong></td></tr>`,
         )
         .join("");
+
+    // Update leaderboard title with the configured win score
+    document.getElementById("leaderboard-title").innerText =
+      `Live Leaderboard (First to ${state.win_score} wins)`;
+
+    // Only show leaderboard between game rounds (during prep delay)
+    const leaderboardRegion = document.getElementById("leaderboard-region");
+    if (state.elapsed < 5) {
+      leaderboardRegion.style.display = "block";
+    } else {
+      leaderboardRegion.style.display = "none";
+    }
+
+    // Session controls buttons display
+    const me = state.players.find((p) => p.id === userId);
+    if (me) {
+      if (me.is_creator) {
+        document.getElementById("end-game-btn").style.display = "block";
+        document.getElementById("leave-game-btn").style.display = "none";
+      } else {
+        document.getElementById("end-game-btn").style.display = "none";
+        document.getElementById("leave-game-btn").style.display = "block";
+      }
+    }
   } catch (error) {
     console.warn("Gameplay sync connection dropped...");
+  }
+}
+
+async function leaveGame() {
+  if (confirm("Are you sure you want to leave the game?")) {
+    const res = await fetch("/api/game/leave", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId }),
+    });
+    if (res.ok) {
+      clearSessionAndRedirect();
+    } else {
+      alert((await res.json()).detail);
+    }
+  }
+}
+
+async function endGame() {
+  if (confirm("Are you sure you want to end the game for everyone?")) {
+    const res = await fetch("/api/game/end", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game_id: gameId, user_id: userId }),
+    });
+    if (res.ok) {
+      clearSessionAndRedirect();
+    } else {
+      alert((await res.json()).detail);
+    }
   }
 }
 
