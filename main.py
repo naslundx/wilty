@@ -83,6 +83,42 @@ class AdminStatementReq(BaseModel):
     used: bool = False
 
 
+# --- Utility Helpers ---
+def get_game_or_404(cursor, game_id: str) -> dict:
+    cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,))
+    game = cursor.fetchone()
+    if not game:
+        raise HTTPException(status_code=404, detail="Game session not found.")
+    return dict(game)
+
+
+def get_user_or_404(
+    cursor, game_id: str, user_id: str, allow_left: bool = False
+) -> dict:
+    cursor.execute(
+        "SELECT is_creator, username, has_left FROM users WHERE id = ? AND game_id = ?",
+        (user_id, game_id),
+    )
+    user = cursor.fetchone()
+    if not user:
+        raise HTTPException(
+            status_code=404, detail="User session not found in this game."
+        )
+    if not allow_left and user["has_left"]:
+        raise HTTPException(status_code=404, detail="User has left this game.")
+    return dict(user)
+
+
+def verify_host(cursor, game_id: str, user_id: str):
+    user = get_user_or_404(cursor, game_id, user_id)
+    if not user["is_creator"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Only the room host is authorized to perform this action.",
+        )
+    return user
+
+
 # --- Routes ---
 @app.post("/api/game/create")
 def create_game(req: CreateGameReq):
@@ -140,6 +176,13 @@ def join_game(req: JoinGameReq):
 @app.post("/api/game/statement")
 def add_statement(req: StatementReq):
     cursor = engine.get_cursor()
+    game = get_game_or_404(cursor, req.game_id)
+    if game["status"] != "waiting":
+        raise HTTPException(
+            status_code=400, detail="Cannot add statements after game has started."
+        )
+    get_user_or_404(cursor, req.game_id, req.user_id)
+
     cursor.execute(
         "INSERT INTO statements (game_id, user_id, text, category) VALUES (?, ?, ?, 'User')",
         (req.game_id, req.user_id, req.text),
@@ -151,11 +194,15 @@ def add_statement(req: StatementReq):
 @app.post("/api/game/start")
 def start_game(req: StartGameReq):
     cursor = engine.get_cursor()
-    cursor.execute("SELECT is_creator FROM users WHERE id = ?", (req.user_id,))
-    user = cursor.fetchone()
-    if not user or not user["is_creator"]:
+    verify_host(cursor, req.game_id, req.user_id)
+
+    cursor.execute(
+        "SELECT COUNT(*) as count FROM users WHERE game_id = ? AND has_left = 0",
+        (req.game_id,),
+    )
+    if cursor.fetchone()["count"] < 2:
         raise HTTPException(
-            status_code=403, detail="Only the room host can start the match."
+            status_code=400, detail="You need at least 2 players to start."
         )
 
     if req.categories:
@@ -180,19 +227,14 @@ def start_game(req: StartGameReq):
 @app.get("/api/game/state/{game_id}/{user_id}")
 def get_state(game_id: str, user_id: str):
     cursor = engine.get_cursor()
-    cursor.execute("SELECT * FROM games WHERE id = ?", (game_id,))
-    game = cursor.fetchone()
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found")
+    game = get_game_or_404(cursor, game_id)
+    get_user_or_404(cursor, game_id, user_id)
 
     cursor.execute(
         "SELECT id, username, score, is_creator FROM users WHERE game_id = ? AND has_left = 0",
         (game_id,),
     )
     players = [dict(row) for row in cursor.fetchall()]
-
-    if not any(p["id"] == user_id for p in players):
-        raise HTTPException(status_code=404, detail="User session not found")
 
     cursor.execute(
         "SELECT id, text FROM statements WHERE id = ?", (game["current_statement_id"],)
@@ -253,6 +295,19 @@ def get_state(game_id: str, user_id: str):
 @app.post("/api/game/vote")
 def post_vote(req: VoteReq):
     cursor = engine.get_cursor()
+    game = get_game_or_404(cursor, req.game_id)
+    if game["status"] != "playing":
+        raise HTTPException(
+            status_code=400, detail="Cannot vote. Game session is not actively playing."
+        )
+
+    get_user_or_404(cursor, req.game_id, req.user_id)
+    if game["current_storyteller_id"] == req.user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Storyteller is not allowed to vote in their own round.",
+        )
+
     cursor.execute(
         "INSERT OR REPLACE INTO votes (game_id, user_id, vote) VALUES (?, ?, ?)",
         (req.game_id, req.user_id, req.vote),
@@ -266,6 +321,12 @@ def rate_prompt(req: RatePromptReq):
     if req.rating not in ["up", "down"]:
         raise HTTPException(status_code=400, detail="Invalid rating specification.")
     cursor = engine.get_cursor()
+
+    # Validate that rating user exists
+    cursor.execute("SELECT id FROM users WHERE id = ?", (req.user_id,))
+    if not cursor.fetchone():
+        raise HTTPException(status_code=404, detail="User session not found.")
+
     try:
         cursor.execute(
             "INSERT INTO prompt_ratings (statement_id, user_id, rating) VALUES (?, ?, ?)",
@@ -282,13 +343,7 @@ def rate_prompt(req: RatePromptReq):
 @app.post("/api/game/resolve")
 def resolve_round(req: ResolveReq):
     cursor = engine.get_cursor()
-    cursor.execute(
-        "SELECT current_storyteller_id, current_statement_id, round_started_at, max_time_limit, win_score, max_rounds, current_round FROM games WHERE id = ?",
-        (req.game_id,),
-    )
-    game = cursor.fetchone()
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found.")
+    game = get_game_or_404(cursor, req.game_id)
     if game["current_storyteller_id"] != req.user_id:
         raise HTTPException(status_code=403, detail="Unauthorized execution handler.")
 
@@ -351,13 +406,7 @@ def resolve_round(req: ResolveReq):
 @app.post("/api/game/leave")
 def leave_game(req: LeaveGameReq):
     cursor = engine.get_cursor()
-    cursor.execute(
-        "SELECT is_creator FROM users WHERE id = ? AND game_id = ?",
-        (req.user_id, req.game_id),
-    )
-    user = cursor.fetchone()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found in this game.")
+    user = get_user_or_404(cursor, req.game_id, req.user_id)
     if user["is_creator"]:
         raise HTTPException(
             status_code=400, detail="Room creator cannot leave. They must end the game."
@@ -365,15 +414,8 @@ def leave_game(req: LeaveGameReq):
 
     cursor.execute("UPDATE users SET has_left = 1 WHERE id = ?", (req.user_id,))
 
-    cursor.execute(
-        "SELECT status, current_storyteller_id FROM games WHERE id = ?", (req.game_id,)
-    )
-    game = cursor.fetchone()
-    if (
-        game
-        and game["status"] == "playing"
-        and game["current_storyteller_id"] == req.user_id
-    ):
+    game = get_game_or_404(cursor, req.game_id)
+    if game["status"] == "playing" and game["current_storyteller_id"] == req.user_id:
         cursor.execute(
             "SELECT id FROM users WHERE game_id = ? AND has_left = 0", (req.game_id,)
         )
@@ -391,15 +433,7 @@ def leave_game(req: LeaveGameReq):
 @app.post("/api/game/end")
 def end_game(req: EndGameReq):
     cursor = engine.get_cursor()
-    cursor.execute(
-        "SELECT is_creator FROM users WHERE id = ? AND game_id = ?",
-        (req.user_id, req.game_id),
-    )
-    user = cursor.fetchone()
-    if not user or not user["is_creator"]:
-        raise HTTPException(
-            status_code=403, detail="Only the room host can end the game."
-        )
+    verify_host(cursor, req.game_id, req.user_id)
 
     cursor.execute("UPDATE games SET status = 'finished' WHERE id = ?", (req.game_id,))
     engine.commit()
