@@ -34,6 +34,11 @@ if (leaveGameBtn) {
   leaveGameBtn.addEventListener("click", leaveGame);
 }
 
+const updateSettingsBtn = document.getElementById("update-settings-btn");
+if (updateSettingsBtn) {
+  updateSettingsBtn.addEventListener("click", updateSettings);
+}
+
 const endGameBtn = document.getElementById("end-game-btn");
 if (endGameBtn) {
   endGameBtn.addEventListener("click", endGame);
@@ -80,6 +85,25 @@ async function pollLobby() {
           .getElementById("creator-config")
           .classList.add("display-block");
         document
+          .getElementById("game-details-card")
+          .classList.add("display-none");
+        document
+          .getElementById("game-details-card")
+          .classList.remove("display-block");
+
+        // Populate inputs if not already focused (to avoid interrupting user typing)
+        const timeInput = document.getElementById("max-time-limit");
+        const scoreInput = document.getElementById("win-score");
+        const roundsInput = document.getElementById("max-rounds");
+
+        if (document.activeElement !== timeInput)
+          {timeInput.value = state.max_time_limit;}
+        if (document.activeElement !== scoreInput)
+          {scoreInput.value = state.win_score;}
+        if (document.activeElement !== roundsInput)
+          {roundsInput.value = state.max_rounds || "";}
+
+        document
           .getElementById("end-game-btn")
           .classList.remove("display-none");
         document.getElementById("end-game-btn").classList.add("display-block");
@@ -92,6 +116,21 @@ async function pollLobby() {
           .getElementById("creator-config")
           .classList.remove("display-block");
         document.getElementById("creator-config").classList.add("display-none");
+
+        document
+          .getElementById("game-details-card")
+          .classList.remove("display-none");
+        document
+          .getElementById("game-details-card")
+          .classList.add("display-block");
+
+        const details = document.getElementById("game-details-content");
+        details.innerHTML = `
+            <div><strong>Max Round Timer:</strong> ${state.max_time_limit > 0 ? state.max_time_limit / 60 + "m" : "No Timer"}</div>
+            <div><strong>Winning Score:</strong> ${state.win_score} points</div>
+            <div><strong>Max Rounds:</strong> ${state.max_rounds || "Default (Players × 2)"}</div>
+        `;
+
         document
           .getElementById("end-game-btn")
           .classList.remove("display-block");
@@ -112,6 +151,50 @@ async function pollLobby() {
       .join("");
   } catch {
     console.warn("Lobby sync interrupted...");
+  }
+}
+
+async function updateSettings() {
+  const maxTimeLimit =
+    parseInt(document.getElementById("max-time-limit").value) || 0;
+  const winScoreInput = document.getElementById("win-score").value.trim();
+  const winScore = winScoreInput ? parseInt(winScoreInput) : 5;
+  if (isNaN(winScore) || winScore <= 0) {
+    return alert("Winning score must be a positive non-zero number!");
+  }
+
+  const maxRoundsInput = document.getElementById("max-rounds").value.trim();
+  const maxRounds = maxRoundsInput ? parseInt(maxRoundsInput) || null : null;
+  if (maxRounds !== null && (isNaN(maxRounds) || maxRounds <= 0)) {
+    return alert("Max rounds limit must be a positive non-zero number!");
+  }
+
+  const btn = document.getElementById("update-settings-btn");
+  btn.disabled = true;
+  btn.innerText = "Updating...";
+
+  try {
+    const res = await fetch("/api/game/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        game_id: gameId,
+        user_id: userId,
+        max_time_limit: maxTimeLimit,
+        win_score: winScore,
+        max_rounds: maxRounds,
+      }),
+    });
+    if (res.ok) {
+      alert("Settings updated successfully!");
+    } else {
+      alert((await res.json()).detail);
+    }
+  } catch {
+    alert("Failed to update settings.");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Update Settings";
   }
 }
 

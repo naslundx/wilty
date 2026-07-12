@@ -52,20 +52,6 @@ async function createGame() {
     return alert("Please enter a nickname!");
   }
 
-  const maxTimeLimit =
-    parseInt(document.getElementById("max-time-limit").value) || 0;
-  const winScoreInput = document.getElementById("win-score").value.trim();
-  const winScore = winScoreInput ? parseInt(winScoreInput) : 5;
-  if (isNaN(winScore) || winScore <= 0) {
-    return alert("Winning score must be a positive non-zero number!");
-  }
-
-  const maxRoundsInput = document.getElementById("max-rounds").value.trim();
-  const maxRounds = maxRoundsInput ? parseInt(maxRoundsInput) || null : null;
-  if (maxRounds !== null && (isNaN(maxRounds) || maxRounds <= 0)) {
-    return alert("Max rounds limit must be a positive non-zero number!");
-  }
-
   // Prevent double click
   const createBtn = document.getElementById("create-game-btn");
   if (createBtn) {
@@ -79,9 +65,6 @@ async function createGame() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username,
-        max_time_limit: maxTimeLimit,
-        win_score: winScore,
-        max_rounds: maxRounds,
       }),
     });
     const data = await res.json();

@@ -110,6 +110,16 @@ heroku logs --tail
 
 ---
 
-## Things to Do
+## Future Roadmap & Potential Improvements
 
-- ...
+Below are suggested enhancements to the "Would You Lie to Me?" engine, categorized by their development complexity and perceived impact on the user experience.
+
+| Improvement | Complexity | Usefulness | Description |
+| :--- | :--- | :--- | :--- |
+| **Real-time WebSockets** | High | ⭐⭐⭐⭐⭐ | Replace the current HTTP polling mechanism with a WebSocket layer for instant state updates, reducing latency and backend overhead. |
+| **AI Prompt Expansion** | Medium-High | ⭐⭐⭐⭐ | Integrate an LLM (e.g., OpenAI/Gemini) to generate context-aware prompts or help players "flesh out" their lies dynamically. |
+| **Persistent User Profiles** | Medium | ⭐⭐⭐⭐ | Add a user authentication layer to track lifetime statistics, accuracy percentages, and win/loss records across different rooms. |
+| **Audio & Haptic Feedback** | Low | ⭐⭐⭐ | Add localized sound effects for buzzer reveals, round starts, and successful votes, along with device vibration on mobile. |
+| **Room Access Controls** | Low-Medium | ⭐⭐⭐ | Implement optional room passwords and "Kick Player" functionality for the host to manage public-facing sessions. |
+| **Theme Engine (Dark Mode)** | Low | ⭐⭐ | Expand the CSS utility system to support a "Dark Mode" toggle or custom room color schemes based on the host's preference. |
+| **Avatar System** | Medium | ⭐⭐ | Allow players to select or generate simple avatars (e.g., via DiceBear) to make the leaderboard more visually engaging. |

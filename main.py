@@ -30,6 +30,14 @@ class CreateGameReq(BaseModel):
     max_rounds: int | None = None
 
 
+class UpdateSettingsReq(BaseModel):
+    game_id: str
+    user_id: str
+    max_time_limit: int
+    win_score: int
+    max_rounds: int | None
+
+
 class JoinGameReq(BaseModel):
     game_id: str
     username: str
@@ -151,6 +159,41 @@ def create_game(req: CreateGameReq):
     )
     engine.commit()
     return {"game_id": game_id, "user_id": user_id}
+
+
+@app.post("/api/game/settings")
+def update_game_settings(req: UpdateSettingsReq):
+    cursor = engine.get_cursor()
+    verify_host(cursor, req.game_id, req.user_id)
+
+    game = get_game_or_404(cursor, req.game_id)
+    if game["status"] != "waiting":
+        raise HTTPException(
+            status_code=400, detail="Cannot update settings after game has started."
+        )
+
+    if req.win_score <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Winning score must be a positive non-zero number.",
+        )
+    if req.max_time_limit < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Max round timer cannot be negative.",
+        )
+    if req.max_rounds is not None and req.max_rounds <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Max rounds limit must be a positive non-zero number.",
+        )
+
+    cursor.execute(
+        "UPDATE games SET max_time_limit = ?, win_score = ?, max_rounds = ? WHERE id = ?",
+        (req.max_time_limit, req.win_score, req.max_rounds, req.game_id),
+    )
+    engine.commit()
+    return {"status": "success"}
 
 
 @app.post("/api/game/join")
