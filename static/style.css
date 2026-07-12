@@ -230,9 +230,29 @@ button:disabled {
     0%, 100% { background-color: #fff7ed; color: #c2410c; opacity: 1; }
     50% { background-color: #fee2e2; color: #991b1b; opacity: 0.5; }
 }
-.timer-flash {
-    animation: timer-flash-animation 1s infinite alternate;
-    border-color: #fca5a5 !important;
+.alert-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background-color: var(--danger);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    z-index: 999999;
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90%;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.alert-banner.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* Responsive Tables & Scoreboards */
@@ -263,6 +283,44 @@ tr:hover {
 body[style*="max-width: 950px"],
 .admin-body {
     max-width: 950px !important;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.badge-waiting {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+.badge-playing {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+.badge-finished {
+    background-color: #d1fae5;
+    color: #059669;
+}
+.badge-system {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+.badge-user {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+}
+.vote-count {
+    font-weight: bold;
+    font-family: monospace;
+}
+.vote-up {
+    color: var(--success);
+}
+.vote-down {
+    color: var(--danger);
 }
 
 /* --- MOBILE SPECIFIC OVERRIDES --- */
@@ -304,6 +362,59 @@ body[style*="max-width: 950px"],
     }
 }
 
-.copyright {
-    font-weight: bolder;
-}
+.text-center { text-align: center; }
+.text-muted { color: #64748b; }
+.margin-top-n10 { margin-top: -10px; }
+.margin-bottom-20 { margin-bottom: 20px; }
+.width-auto { width: auto; }
+.padding-8-16 { padding: 8px 16px; }
+.font-weight-600 { font-weight: 600; }
+.font-size-14 { font-size: 14px; }
+.margin-top-10 { margin-top: 10px; }
+.margin-top-12 { margin-top: 12px; }
+.margin-top-15 { margin-top: 15px; }
+.margin-top-25 { margin-top: 25px; }
+.display-flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.align-items-center { align-items: center; }
+.justify-content-between { justify-content: space-between; }
+.gap-10 { gap: 10px; }
+.gap-6 { gap: 6px; }
+.display-none { display: none !important; }
+.display-block { display: block !important; }
+.border-2-solid-accent { border: 2px solid var(--accent); }
+.text-transform-uppercase { text-transform: uppercase; }
+.padding-10-20 { padding: 10px 20px; }
+.padding-4-8 { padding: 4px 8px; }
+.padding-6-10 { padding: 6px 10px; }
+.font-family-monospace { font-family: monospace; }
+.font-size-13 { font-size: 13px; }
+.font-style-italic { font-style: italic; }
+.max-width-260 { max-width: 260px; }
+.word-wrap-break-word { word-wrap: break-word; }
+.bg-indigo-100 { background: #e0e7ff; }
+.margin-0 { margin: 0; }
+.text-color-accent { color: var(--accent); }
+.padding-40-20 { padding: 40px 20px; }
+.position-relative { position: relative; }
+.font-size-12 { font-size: 12px; }
+.letter-spacing-1 { letter-spacing: 1px; }
+.margin-bottom-5 { margin-bottom: 5px; }
+.padding-6-10 { padding: 6px 10px; }
+.font-size-16 { font-size: 16px; }
+.bg-gray-100 { background-color: #f1f5f9; }
+.text-color-slate-600 { color: #475569; }
+.bg-success { background-color: var(--success); }
+.bg-indigo-500 { background-color: var(--accent); }
+.shadow-none { box-shadow: none; }
+.font-weight-bolder { font-weight: bolder; }
+.text-align-center { text-align: center; }
+.letter-spacing-2 { letter-spacing: 2px; }
+.white-space-nowrap { white-space: nowrap; }
+.accent-color-accent { accent-color: var(--accent); }
+.margin-top-20 { margin-top: 20px; }
+.margin-bottom-5 { margin-bottom: 5px; }
+.margin-bottom-10 { margin-bottom: 10px; }
+.padding-left-20 { padding-left: 20px; }
+.line-height-2 { line-height: 2; }
+.size-18 { width: 18px; height: 18px; }

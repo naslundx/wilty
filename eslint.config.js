@@ -15,11 +15,14 @@ export default [
                 clearInterval: "readonly",
                 setTimeout: "readonly",
                 clearTimeout: "readonly",
-                fetch: "readonly"
+                fetch: "readonly",
+                clearSessionAndRedirect: "readonly",
+                leaveGame: "readonly",
+                endGame: "readonly"
             }
         },
         rules: {
-            "no-unused-vars": "off",
+            "no-unused-vars": "error",
             "no-console": "off",
             "no-undef": "error",
             "eqeqeq": "error",

@@ -1,47 +1,3 @@
-window.alert = function (message) {
-  const existing = document.getElementById("app-alert-banner");
-  if (existing) {
-    existing.remove();
-  }
-
-  const banner = document.createElement("div");
-  banner.id = "app-alert-banner";
-  banner.innerText = message;
-  banner.style.position = "fixed";
-  banner.style.top = "20px";
-  banner.style.left = "50%";
-  banner.style.transform = "translateX(-50%) translateY(-20px)";
-  banner.style.backgroundColor = "var(--danger)";
-  banner.style.color = "white";
-  banner.style.padding = "14px 24px";
-  banner.style.borderRadius = "8px";
-  banner.style.boxShadow =
-    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-  banner.style.zIndex = "999999";
-  banner.style.fontWeight = "600";
-  banner.style.fontSize = "15px";
-  banner.style.textAlign = "center";
-  banner.style.minWidth = "280px";
-  banner.style.maxWidth = "90%";
-  banner.style.opacity = "0";
-  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-
-  document.body.appendChild(banner);
-
-  setTimeout(() => {
-    banner.style.opacity = "1";
-    banner.style.transform = "translateX(-50%) translateY(0)";
-  }, 10);
-
-  setTimeout(() => {
-    banner.style.opacity = "0";
-    banner.style.transform = "translateX(-50%) translateY(-20px)";
-    setTimeout(() => {
-      banner.remove();
-    }, 300);
-  }, 4000);
-};
-
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
 
@@ -73,6 +29,11 @@ async function renderFinals() {
 function returnHome() {
   localStorage.clear();
   window.location.href = "/";
+}
+
+const returnHomeBtn = document.getElementById("return-home-btn");
+if (returnHomeBtn) {
+  returnHomeBtn.addEventListener("click", returnHome);
 }
 
 renderFinals();

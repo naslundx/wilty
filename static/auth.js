@@ -1,47 +1,3 @@
-window.alert = function (message) {
-  const existing = document.getElementById("app-alert-banner");
-  if (existing) {
-    existing.remove();
-  }
-
-  const banner = document.createElement("div");
-  banner.id = "app-alert-banner";
-  banner.innerText = message;
-  banner.style.position = "fixed";
-  banner.style.top = "20px";
-  banner.style.left = "50%";
-  banner.style.transform = "translateX(-50%) translateY(-20px)";
-  banner.style.backgroundColor = "var(--danger)";
-  banner.style.color = "white";
-  banner.style.padding = "14px 24px";
-  banner.style.borderRadius = "8px";
-  banner.style.boxShadow =
-    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-  banner.style.zIndex = "999999";
-  banner.style.fontWeight = "600";
-  banner.style.fontSize = "15px";
-  banner.style.textAlign = "center";
-  banner.style.minWidth = "280px";
-  banner.style.maxWidth = "90%";
-  banner.style.opacity = "0";
-  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-
-  document.body.appendChild(banner);
-
-  setTimeout(() => {
-    banner.style.opacity = "1";
-    banner.style.transform = "translateX(-50%) translateY(0)";
-  }, 10);
-
-  setTimeout(() => {
-    banner.style.opacity = "0";
-    banner.style.transform = "translateX(-50%) translateY(-20px)";
-    setTimeout(() => {
-      banner.remove();
-    }, 300);
-  }, 4000);
-};
-
 window.onload = () => {
   if (localStorage.getItem("game_id") && localStorage.getItem("user_id")) {
     window.location.href = "/lobby";
@@ -65,6 +21,10 @@ window.onload = () => {
   // Bind Enter key on game-id input
   const gameIdInput = document.getElementById("game-id-input");
   if (gameIdInput) {
+    gameIdInput.addEventListener(
+      "oninput" in gameIdInput ? "input" : "keyup",
+      validateRoomCode,
+    );
     gameIdInput.addEventListener("keyup", (event) => {
       if (
         event.key === "Enter" &&
@@ -73,6 +33,16 @@ window.onload = () => {
         joinGame();
       }
     });
+  }
+
+  const createGameBtn = document.getElementById("create-game-btn");
+  if (createGameBtn) {
+    createGameBtn.addEventListener("click", createGame);
+  }
+
+  const joinBtn = document.getElementById("join-btn");
+  if (joinBtn) {
+    joinBtn.addEventListener("click", joinGame);
   }
 };
 
@@ -97,7 +67,7 @@ async function createGame() {
   }
 
   // Prevent double click
-  const createBtn = document.querySelector("button[onclick='createGame()']");
+  const createBtn = document.getElementById("create-game-btn");
   if (createBtn) {
     createBtn.disabled = true;
     createBtn.innerText = "Creating Room...";

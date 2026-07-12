@@ -1,51 +1,27 @@
-window.alert = function (message) {
-  const existing = document.getElementById("app-alert-banner");
-  if (existing) {
-    existing.remove();
-  }
-
-  const banner = document.createElement("div");
-  banner.id = "app-alert-banner";
-  banner.innerText = message;
-  banner.style.position = "fixed";
-  banner.style.top = "20px";
-  banner.style.left = "50%";
-  banner.style.transform = "translateX(-50%) translateY(-20px)";
-  banner.style.backgroundColor = "var(--danger)";
-  banner.style.color = "white";
-  banner.style.padding = "14px 24px";
-  banner.style.borderRadius = "8px";
-  banner.style.boxShadow =
-    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-  banner.style.zIndex = "999999";
-  banner.style.fontWeight = "600";
-  banner.style.fontSize = "15px";
-  banner.style.textAlign = "center";
-  banner.style.minWidth = "280px";
-  banner.style.maxWidth = "90%";
-  banner.style.opacity = "0";
-  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-
-  document.body.appendChild(banner);
-
-  setTimeout(() => {
-    banner.style.opacity = "1";
-    banner.style.transform = "translateX(-50%) translateY(0)";
-  }, 10);
-
-  setTimeout(() => {
-    banner.style.opacity = "0";
-    banner.style.transform = "translateX(-50%) translateY(-20px)";
-    setTimeout(() => {
-      banner.remove();
-    }, 300);
-  }, 4000);
-};
-
 let statementsData = [];
 
 window.onload = () => {
   loadDashboardData();
+
+  const refreshBtn = document.getElementById("refresh-dashboard-btn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", loadDashboardData);
+  }
+
+  const addBtn = document.getElementById("add-statement-btn");
+  if (addBtn) {
+    addBtn.addEventListener("click", showAddForm);
+  }
+
+  const cancelBtn = document.getElementById("cancel-statement-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", cancelStatementForm);
+  }
+
+  const form = document.getElementById("admin-statement-form");
+  if (form) {
+    form.addEventListener("submit", saveStatement);
+  }
 };
 
 async function loadDashboardData() {
@@ -70,14 +46,14 @@ async function loadDashboardData() {
 function renderGamesTable(games) {
   const tbody = document.querySelector("#admin-games-table tbody");
   if (games.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#64748b;">No active room records in database.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No active room records in database.</td></tr>`;
     return;
   }
   tbody.innerHTML = games
     .map(
       (g) => `
         <tr>
-            <td><span class="highlight-box" style="padding:4px 8px;">${g.id}</span></td>
+            <td><span class="highlight-box padding-4-8">${g.id}</span></td>
             <td><span class="badge badge-${g.status}">${g.status}</span></td>
             <td>${g.current_storyteller_id ? g.current_storyteller_id : "None"}</td>
             <td>${g.current_statement_id ? `#${g.current_statement_id}` : "None"}</td>
@@ -90,15 +66,15 @@ function renderGamesTable(games) {
 function renderUsersTable(users) {
   const tbody = document.querySelector("#admin-users-table tbody");
   if (users.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No active player nodes online.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No active player nodes online.</td></tr>`;
     return;
   }
   tbody.innerHTML = users
     .map(
       (u) => `
         <tr>
-            <td><span style="font-family:monospace; font-size:13px;">${u.id}</span></td>
-            <td><span class="highlight-box" style="padding:2px 6px;">${u.game_id}</span></td>
+            <td><span class="font-family-monospace font-size-13">${u.id}</span></td>
+            <td><span class="highlight-box padding-2-6">${u.game_id}</span></td>
             <td><strong>${u.username}</strong></td>
             <td>${u.score} pts</td>
             <td>${u.is_creator ? "Host" : "Guesser"}</td>
@@ -111,7 +87,7 @@ function renderUsersTable(users) {
 function renderStatementsTable(statements) {
   const tbody = document.querySelector("#admin-statements-table tbody");
   if (statements.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">Statement system registry completely empty.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Statement system registry completely empty.</td></tr>`;
     return;
   }
 
@@ -130,22 +106,33 @@ function renderStatementsTable(statements) {
                 <td>#${s.id}</td>
                 <td>${scopeText}</td>
                 <td>${originBadge}</td>
-                <td style="font-style:italic; max-width:260px; word-wrap:break-word;">"${s.text}"</td>
+                <td class="font-style-italic max-width-260 word-wrap-break-word">"${s.text}"</td>
                 <td>${s.used ? "Used" : "Available"}</td>
                 <td>
                     <span class="vote-count vote-up">+${ups}</span> /
                     <span class="vote-count vote-down">-${downs}</span>
                 </td>
                 <td>
-                    <div style="display: flex; gap: 6px;">
-                        <button onclick="editStatementById(${s.id})" style="width: auto; min-height: auto; padding: 6px 10px; font-size: 13px; background-color: var(--accent);"><i class="fa fa-pencil"></i></button>
-                        <button onclick="deleteStatement(${s.id})" style="width: auto; min-height: auto; padding: 6px 10px; font-size: 13px; background-color: var(--danger);"><i class="fa fa-trash"></i></button>
+                    <div class="display-flex gap-6">
+                        <button data-action="edit" data-id="${s.id}" class="bg-indigo-500 width-auto padding-6-10 font-size-13"><i class="fa fa-pencil"></i></button>
+                        <button data-action="delete" data-id="${s.id}" class="bg-danger width-auto padding-6-10 font-size-13"><i class="fa fa-trash"></i></button>
                     </div>
                 </td>
             </tr>
         `;
     })
     .join("");
+
+  // Add event listeners to the dynamic buttons
+  tbody.querySelectorAll("button[data-id]").forEach((btn) => {
+    const id = parseInt(btn.getAttribute("data-id"));
+    const action = btn.getAttribute("data-action");
+    if (action === "edit") {
+      btn.addEventListener("click", () => editStatementById(id));
+    } else if (action === "delete") {
+      btn.addEventListener("click", () => deleteStatement(id));
+    }
+  });
 }
 
 function showAddForm() {
@@ -157,7 +144,8 @@ function showAddForm() {
   document.getElementById("form-used").checked = false;
 
   const card = document.getElementById("statement-form-card");
-  card.style.display = "block";
+  card.classList.remove("display-none");
+  card.classList.add("display-block");
   card.scrollIntoView({ behavior: "smooth" });
 }
 
@@ -175,12 +163,16 @@ function editStatementById(id) {
   document.getElementById("form-used").checked = !!s.used;
 
   const card = document.getElementById("statement-form-card");
-  card.style.display = "block";
+  card.classList.remove("display-none");
+  card.classList.add("display-block");
   card.scrollIntoView({ behavior: "smooth" });
 }
 
 function cancelStatementForm() {
-  document.getElementById("statement-form-card").style.display = "none";
+  document
+    .getElementById("statement-form-card")
+    .classList.remove("display-block");
+  document.getElementById("statement-form-card").classList.add("display-none");
 }
 
 async function saveStatement(event) {

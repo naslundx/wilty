@@ -6,59 +6,17 @@
         <title>Would You Lie to Me? - Admin Console</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="/style.css" />
-        <style>
-            body {
-                max-width: 950px;
-            }
-            .badge {
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
-            .badge-waiting {
-                background-color: #fef3c7;
-                color: #d97706;
-            }
-            .badge-playing {
-                background-color: #dbeafe;
-                color: #2563eb;
-            }
-            .badge-finished {
-                background-color: #d1fae5;
-                color: #059669;
-            }
-            .badge-system {
-                background-color: #e2e8f0;
-                color: #475569;
-            }
-            .badge-user {
-                background-color: #f5f3ff;
-                color: #7c3aed;
-            }
-            .vote-count {
-                font-weight: bold;
-                font-family: monospace;
-            }
-            .vote-up {
-                color: var(--success);
-            }
-            .vote-down {
-                color: var(--danger);
-            }
-        </style>
     </head>
-    <body>
+    <body class="admin-body">
         <h1>System Database Console</h1>
-        <p style="text-align: center; color: #64748b; margin-top: -10px">
+        <p class="text-center text-muted margin-top-n10">
             Real-time overview of games, players, and prompt feedback metrics.
         </p>
 
-        <div style="text-align: center; margin-bottom: 20px">
+        <div class="text-center margin-bottom-20">
             <button
-                onclick="loadDashboardData()"
-                style="width: auto; padding: 8px 16px"
+                id="refresh-dashboard-btn"
+                class="width-auto padding-8-16"
             >
                 Refresh Dashboard Data
             </button>
@@ -77,7 +35,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="4" style="color: #64748b">
+                        <td colspan="4" class="text-muted">
                             Loading metrics...
                         </td>
                     </tr>
@@ -99,7 +57,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="5" style="color: #64748b">
+                        <td colspan="5" class="text-muted">
                             Loading metrics...
                         </td>
                     </tr>
@@ -108,18 +66,18 @@
         </div>
 
         <!-- Statement Form Card -->
-        <div class="card" id="statement-form-card" style="display: none; border: 2px solid var(--accent)">
+        <div class="card display-none border-2-solid-accent" id="statement-form-card">
             <h2 id="form-title">Add/Edit Statement</h2>
-            <form id="admin-statement-form" onsubmit="saveStatement(event)">
+            <form id="admin-statement-form">
                 <input type="hidden" id="form-statement-id" value="">
                 
-                <div style="margin-top: 10px;">
-                    <label style="font-weight:600; font-size:14px;">Statement Text:</label>
+                <div class="margin-top-10">
+                    <label class="font-weight-600 font-size-14">Statement Text:</label>
                     <input type="text" id="form-text" required placeholder="e.g., I once ate a giant raw onion on a dare.">
                 </div>
                 
-                <div style="margin-top: 10px;">
-                    <label style="font-weight:600; font-size:14px;">Category:</label>
+                <div class="margin-top-10">
+                    <label class="font-weight-600 font-size-14">Category:</label>
                     <select id="form-category">
                         <option value="Casual">Casual</option>
                         <option value="Work & School">Work & School</option>
@@ -128,27 +86,27 @@
                     </select>
                 </div>
                 
-                <div style="margin-top: 10px;">
-                    <label style="font-weight:600; font-size:14px;">Scope (Room Code / Game ID):</label>
-                    <input type="text" id="form-game-id" placeholder="Leave blank for Global Preset" style="text-transform: uppercase;" maxlength="5">
+                <div class="margin-top-10">
+                    <label class="font-weight-600 font-size-14">Scope (Room Code / Game ID):</label>
+                    <input type="text" id="form-game-id" placeholder="Leave blank for Global Preset" class="text-transform-uppercase" maxlength="5">
                 </div>
 
-                <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="form-used" style="width:18px; height:18px; accent-color: var(--accent); margin: 0;">
-                    <label for="form-used" style="font-size:14px; font-weight:600; cursor:pointer;">Mark as Used</label>
+                <div class="margin-top-12 display-flex align-items-center gap-10">
+                    <input type="checkbox" id="form-used" class="size-18 accent-color-accent margin-0">
+                    <label for="form-used" class="font-size-14 font-weight-600">Mark as Used</label>
                 </div>
                 
-                <div class="flex-group" style="margin-top: 15px;">
-                    <button type="submit" style="background-color: var(--success); width: auto; padding: 10px 20px;">Save Statement Asset</button>
-                    <button type="button" class="btn-alt" onclick="cancelStatementForm()" style="width: auto; padding: 10px 20px;">Cancel</button>
+                <div class="flex-group margin-top-15">
+                    <button type="submit" class="bg-success width-auto padding-10-20">Save Statement Asset</button>
+                    <button type="button" id="cancel-statement-btn" class="btn-alt width-auto padding-10-20">Cancel</button>
                 </div>
             </form>
         </div>
 
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0;">Statement Bank Summary & Statistics</h2>
-                <button onclick="showAddForm()" style="width: auto; min-height: auto; padding: 8px 16px; font-size: 14px; background-color: var(--accent);">
+            <div class="display-flex justify-content-between align-items-center margin-bottom-12 flex-wrap gap-10">
+                <h2 class="margin-0">Statement Bank Summary & Statistics</h2>
+                <button id="add-statement-btn" class="width-auto padding-8-16 font-size-14 bg-indigo-500">
                     <i class="fa fa-plus"></i> Add New Statement
                 </button>
             </div>
@@ -166,7 +124,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="7" style="color: #64748b">
+                        <td colspan="7" class="text-muted">
                             Loading metrics...
                         </td>
                     </tr>
@@ -174,6 +132,7 @@
             </table>
         </div>
 
+        <script src="/utils.js"></script>
         <script src="/admin.js"></script>
     </body>
 </html>

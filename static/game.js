@@ -1,47 +1,3 @@
-window.alert = function (message) {
-  const existing = document.getElementById("app-alert-banner");
-  if (existing) {
-    existing.remove();
-  }
-
-  const banner = document.createElement("div");
-  banner.id = "app-alert-banner";
-  banner.innerText = message;
-  banner.style.position = "fixed";
-  banner.style.top = "20px";
-  banner.style.left = "50%";
-  banner.style.transform = "translateX(-50%) translateY(-20px)";
-  banner.style.backgroundColor = "var(--danger)";
-  banner.style.color = "white";
-  banner.style.padding = "14px 24px";
-  banner.style.borderRadius = "8px";
-  banner.style.boxShadow =
-    "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-  banner.style.zIndex = "999999";
-  banner.style.fontWeight = "600";
-  banner.style.fontSize = "15px";
-  banner.style.textAlign = "center";
-  banner.style.minWidth = "280px";
-  banner.style.maxWidth = "90%";
-  banner.style.opacity = "0";
-  banner.style.transition = "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)";
-
-  document.body.appendChild(banner);
-
-  setTimeout(() => {
-    banner.style.opacity = "1";
-    banner.style.transform = "translateX(-50%) translateY(0)";
-  }, 10);
-
-  setTimeout(() => {
-    banner.style.opacity = "0";
-    banner.style.transform = "translateX(-50%) translateY(-20px)";
-    setTimeout(() => {
-      banner.remove();
-    }, 300);
-  }, 4000);
-};
-
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
 if (!gameId || !userId) {
@@ -83,7 +39,8 @@ async function pollGame() {
     // Render Countdown Timer text
     if (state.time_remaining !== null) {
       const timerEl = document.getElementById("game-timer");
-      timerEl.style.display = "block";
+      timerEl.classList.remove("display-none");
+      timerEl.classList.add("display-block");
       timerEl.innerHTML = `<i class="fa fa-clock-o"></i> Time Remaining: ${state.time_remaining}s`;
       if (state.time_remaining <= 0) {
         timerEl.classList.add("timer-flash");
@@ -91,7 +48,8 @@ async function pollGame() {
         timerEl.classList.remove("timer-flash");
       }
     } else {
-      document.getElementById("game-timer").style.display = "none";
+      document.getElementById("game-timer").classList.remove("display-block");
+      document.getElementById("game-timer").classList.add("display-none");
     }
 
     const currentStoryteller = state.players.find(
@@ -110,7 +68,8 @@ async function pollGame() {
     const ratingBox = document.getElementById("prompt-rating-region");
     if (state.statement_id && state.elapsed >= 5) {
       // Only allow rating after the prep delay reveals it
-      ratingBox.style.display = "block";
+      ratingBox.classList.remove("display-none");
+      ratingBox.classList.add("display-block");
       if (state.has_rated_prompt) {
         document.getElementById("rate-up-btn").disabled = true;
         document.getElementById("rate-down-btn").disabled = true;
@@ -119,13 +78,22 @@ async function pollGame() {
         document.getElementById("rate-down-btn").disabled = false;
       }
     } else {
-      ratingBox.style.display = "none";
+      ratingBox.classList.remove("display-block");
+      ratingBox.classList.add("display-none");
     }
 
     const isMeStoryteller = state.storyteller_id === userId;
     if (isMeStoryteller) {
-      document.getElementById("storyteller-controls").style.display = "block";
-      document.getElementById("guesser-controls").style.display = "none";
+      document
+        .getElementById("storyteller-controls")
+        .classList.remove("display-none");
+      document
+        .getElementById("storyteller-controls")
+        .classList.add("display-block");
+      document
+        .getElementById("guesser-controls")
+        .classList.remove("display-block");
+      document.getElementById("guesser-controls").classList.add("display-none");
 
       // Check resolve condition rules (all voted OR timer out)
       const canResolve =
@@ -150,23 +118,38 @@ async function pollGame() {
         }
       }
     } else {
-      document.getElementById("storyteller-controls").style.display = "none";
+      document
+        .getElementById("storyteller-controls")
+        .classList.remove("display-block");
+      document
+        .getElementById("storyteller-controls")
+        .classList.add("display-none");
       const guesserBox = document.getElementById("guesser-controls");
 
       if (state.elapsed < 5) {
-        guesserBox.style.display = "none";
+        guesserBox.classList.remove("display-block");
+        guesserBox.classList.add("display-none");
       } else if (state.has_voted) {
         guesserBox.innerHTML =
-          "<p style='text-align:center; font-weight:600; color:var(--success);'>Your choice is logged. Waiting for cross-examination to finish.</p>";
-        guesserBox.style.display = "block";
+          "<p class='text-center font-weight-600 bg-success'>Your choice is logged. Waiting for cross-examination to finish.</p>";
+        guesserBox.classList.remove("display-none");
+        guesserBox.classList.add("display-block");
       } else {
         guesserBox.innerHTML = `
-                    <h3 style="margin-top:0;">Cast Your Verdict</h3>
+                    <h3 class='margin-top-0'>Cast Your Verdict</h3>
                     <div class="flex-group">
-                        <button onclick="submitVote(true)" style="background-color:var(--success);">Truth</button>
-                        <button onclick="submitVote(false)" style="background-color:var(--danger);">Lie</button>
+                        <button id="vote-true-btn" class='bg-success'>Truth</button>
+                        <button id="vote-false-btn" class='bg-danger'>Lie</button>
                     </div>`;
-        guesserBox.style.display = "block";
+        guesserBox.classList.remove("display-none");
+        guesserBox.classList.add("display-block");
+
+        document
+          .getElementById("vote-true-btn")
+          .addEventListener("click", () => submitVote(true));
+        document
+          .getElementById("vote-false-btn")
+          .addEventListener("click", () => submitVote(false));
       }
     }
 
@@ -188,25 +171,81 @@ async function pollGame() {
     // Only show leaderboard between game rounds (during prep delay)
     const leaderboardRegion = document.getElementById("leaderboard-region");
     if (state.elapsed < 5) {
-      leaderboardRegion.style.display = "block";
+      leaderboardRegion.classList.remove("display-none");
+      leaderboardRegion.classList.add("display-block");
     } else {
-      leaderboardRegion.style.display = "none";
+      leaderboardRegion.classList.remove("display-block");
+      leaderboardRegion.classList.add("display-none");
     }
 
     // Session controls buttons display
     const me = state.players.find((p) => p.id === userId);
     if (me) {
       if (me.is_creator) {
-        document.getElementById("end-game-btn").style.display = "block";
-        document.getElementById("leave-game-btn").style.display = "none";
+        document
+          .getElementById("end-game-btn")
+          .classList.remove("display-none");
+        document.getElementById("end-game-btn").classList.add("display-block");
+        document
+          .getElementById("leave-game-btn")
+          .classList.remove("display-block");
+        document.getElementById("leave-game-btn").classList.add("display-none");
       } else {
-        document.getElementById("end-game-btn").style.display = "none";
-        document.getElementById("leave-game-btn").style.display = "block";
+        document
+          .getElementById("end-game-btn")
+          .classList.remove("display-block");
+        document.getElementById("end-game-btn").classList.add("display-none");
+        document
+          .getElementById("leave-game-btn")
+          .classList.remove("display-none");
+        document
+          .getElementById("leave-game-btn")
+          .classList.add("display-block");
       }
     }
   } catch {
     console.warn("Gameplay sync connection dropped...");
   }
+}
+
+// Global Event Listeners
+document
+  .getElementById("rate-up-btn")
+  .addEventListener("click", () => ratePrompt("up"));
+document
+  .getElementById("rate-down-btn")
+  .addEventListener("click", () => ratePrompt("down"));
+
+// Storyteller controls are rendered in the HTML, so we can bind them once
+const resTrueBtn = document.getElementById("resolve-true-btn");
+if (resTrueBtn) {
+  resTrueBtn.addEventListener("click", () => resolveRound(true));
+}
+
+const resFalseBtn = document.getElementById("resolve-false-btn");
+if (resFalseBtn) {
+  resFalseBtn.addEventListener("click", () => resolveRound(false));
+}
+
+// Guesser controls in HTML (initial state)
+const voteTrueBtn = document.getElementById("vote-true-btn");
+if (voteTrueBtn) {
+  voteTrueBtn.addEventListener("click", () => submitVote(true));
+}
+
+const voteFalseBtn = document.getElementById("vote-false-btn");
+if (voteFalseBtn) {
+  voteFalseBtn.addEventListener("click", () => submitVote(false));
+}
+
+const leaveGameBtn = document.getElementById("leave-game-btn");
+if (leaveGameBtn) {
+  leaveGameBtn.addEventListener("click", leaveGame);
+}
+
+const endGameBtn = document.getElementById("end-game-btn");
+if (endGameBtn) {
+  endGameBtn.addEventListener("click", endGame);
 }
 
 async function leaveGame() {
@@ -243,7 +282,7 @@ async function submitVote(val) {
   const guesserBox = document.getElementById("guesser-controls");
   if (guesserBox) {
     guesserBox.innerHTML =
-      "<p style='text-align:center; font-weight:600; color:var(--accent);'>Logging your choice...</p>";
+      "<p class='text-center font-weight-600 text-color-accent'>Your choice is logged. Waiting for cross-examination to finish.</p>";
   }
 
   try {

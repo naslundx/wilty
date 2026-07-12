@@ -10,70 +10,39 @@
     <body>
         <div id="game-timer" class="timer-banner"><i class="fa fa-clock-o"></i> Time Remaining: --s</div>
 
-        <div class="card" style="background: #e0e7ff; text-align: center">
-            <h3 id="storyteller-banner" style="margin: 0; color: var(--accent)">
+        <div class="card bg-indigo-100 text-center">
+            <h3 id="storyteller-banner" class="margin-0 text-color-accent">
                 Synchronizing active storyteller...
             </h3>
         </div>
 
-        <div
-            class="card"
-            style="text-align: center; padding: 40px 20px; position: relative"
-        >
-            <p
-                style="
-                    text-transform: uppercase;
-                    font-size: 12px;
-                    letter-spacing: 1px;
-                    color: #64748b;
-                    margin-top: 0;
-                "
-            >
+        <div class="card text-center padding-40-20 position-relative">
+            <p class="text-transform-uppercase font-size-12 letter-spacing-1 text-muted margin-0">
                 Presented Asserted Fact:
             </p>
-            <h2 id="statement-display" style="font-style: italic">
+            <h2 id="statement-display" class="font-style-italic">
                 "Loading content..."
             </h2>
 
             <!-- Optional Prompt Utility Feedback Row -->
             <div
                 id="prompt-rating-region"
-                style="margin-top: 25px; display: none"
+                class="margin-top-25 display-none"
             >
-                <p style="font-size: 12px; color: #64748b; margin-bottom: 5px">
+                <p class="font-size-12 text-muted margin-bottom-5">
                     Rate this prompt option:
                 </p>
-                <div style="display: inline-flex; gap: 10px">
+                <div class="display-inline-flex gap-10">
                     <button
                         id="rate-up-btn"
-                        onclick="ratePrompt('up')"
-                        style="
-                            width: auto;
-                            min-height: auto;
-                            padding: 8px 16px;
-                            font-size: 16px;
-                            background-color: #f1f5f9;
-                            color: #475569;
-                            border: 1px solid #cbd5e1;
-                            box-shadow: none;
-                        "
+                        class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
                         title="Thumbs Up"
                     >
                         <i class="fa fa-thumbs-up"></i>
                     </button>
                     <button
                         id="rate-down-btn"
-                        onclick="ratePrompt('down')"
-                        style="
-                            width: auto;
-                            min-height: auto;
-                            padding: 8px 16px;
-                            font-size: 16px;
-                            background-color: #f1f5f9;
-                            color: #475569;
-                            border: 1px solid #cbd5e1;
-                            box-shadow: none;
-                        "
+                        class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
                         title="Thumbs Down"
                     >
                         <i class="fa fa-thumbs-down"></i>
@@ -83,18 +52,18 @@
         </div>
 
         <!-- Guesser Controls Interface -->
-        <div id="guesser-controls" class="card" style="display: none">
-            <h3 style="margin-top: 0">Cast Your Verdict</h3>
+        <div id="guesser-controls" class="card display-none">
+            <h3 class="margin-0">Cast Your Verdict</h3>
             <div class="flex-group">
                 <button
-                    onclick="submitVote(true)"
-                    style="background-color: var(--success)"
+                    id="vote-true-btn"
+                    class="bg-success"
                 >
                     Truth
                 </button>
                 <button
-                    onclick="submitVote(false)"
-                    style="background-color: var(--danger)"
+                    id="vote-false-btn"
+                    class="bg-danger"
                 >
                     Lie
                 </button>
@@ -104,10 +73,9 @@
         <!-- Storyteller Evaluation Interface -->
         <div
             id="storyteller-controls"
-            class="card"
-            style="display: none; border: 2px solid var(--accent)"
+            class="card display-none border-2-solid-accent"
         >
-            <h3 style="margin-top: 0; color: var(--accent)">
+            <h3 class="margin-0 text-color-accent">
                 You are the Storyteller!
             </h3>
             <p>
@@ -118,35 +86,27 @@
             <div class="flex-group">
                 <button
                     id="resolve-true-btn"
-                    onclick="resolveRound(true)"
-                    style="background-color: var(--success)"
+                    class="bg-success"
                 >
                     I Told The Truth
                 </button>
                 <button
                     id="resolve-false-btn"
-                    onclick="resolveRound(false)"
-                    style="background-color: var(--danger)"
+                    class="bg-danger"
                 >
                     I Was Lying!
                 </button>
             </div>
             <p
                 id="storyteller-lock-notice"
-                style="
-                    font-size: 12px;
-                    color: var(--danger);
-                    text-align: center;
-                    margin-top: 10px;
-                    font-weight: 600;
-                "
+                class="font-size-12 text-color-red margin-top-10 font-weight-600 text-center"
             ></p>
         </div>
 
         <div class="card">
             <p
                 id="vote-summary"
-                style="font-weight: 600; text-align: center; color: #475569"
+                class="font-weight-600 text-center text-color-slate-600"
             ></p>
             <div id="leaderboard-region">
                 <h3 id="leaderboard-title">Live Leaderboard (First to 5 wins)</h3>
@@ -156,9 +116,10 @@
 
         <div class="card">
             <h3>Session Controls</h3>
-            <button id="leave-game-btn" class="btn-danger" onclick="leaveGame()" style="display: none;">Leave Game</button>
-            <button id="end-game-btn" class="btn-danger" onclick="endGame()" style="display: none;">End Game</button>
+            <button id="leave-game-btn" class="btn-danger display-none">Leave Game</button>
+            <button id="end-game-btn" class="btn-danger display-none">End Game</button>
         </div>
+        <script src="/utils.js"></script>
         <script src="/game.js"></script>
     </body>
 </html>

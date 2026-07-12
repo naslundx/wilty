@@ -12,14 +12,13 @@
             <p>Share this Room Code with friends:</p>
             <div
                 id="lobby-code-display"
-                class="highlight-box"
-                style="font-size: 24px; text-align: center; letter-spacing: 2px"
+                class="highlight-box font-size-24 text-center letter-spacing-2"
             ></div>
         </div>
 
         <div class="card">
             <h3>Add your own statements</h3>
-            <p style="font-size: 14px; color: #64748b">
+            <p class="font-size-14 text-muted">
                 These are linked to this specific game and may be randomly
                 chosen.
             </p>
@@ -30,17 +29,17 @@
                     placeholder="e.g., I once used AI to make this game."
                 />
                 <button
-                    onclick="submitStatement()"
-                    style="width: auto; white-space: nowrap"
+                    id="submit-statement-btn"
+                    class="width-auto white-space-nowrap"
                 >
                     Add Secret
                 </button>
             </div>
         </div>
 
-        <div id="creator-config" class="card" style="display: none">
+        <div id="creator-config" class="card display-none">
             <h3>Room System Settings</h3>
-            <p style="font-size: 14px; color: #64748b">
+            <p class="font-size-14 text-muted">
                 Select statement pool categories to include:
             </p>
             <div class="checkbox-card">
@@ -69,8 +68,8 @@
             </div>
             <br />
             <button
-                onclick="startGame()"
-                style="background-color: var(--success)"
+                id="start-game-btn"
+                class="bg-success"
             >
                 Start!
             </button>
@@ -80,15 +79,16 @@
             <h3>Active Connected Players</h3>
             <ul
                 id="players-list"
-                style="padding-left: 20px; line-height: 2"
+                class="padding-left-20 line-height-2"
             ></ul>
         </div>
 
         <div class="card">
             <h3>Session Controls</h3>
-            <button id="leave-game-btn" class="btn-danger" onclick="leaveGame()" style="display: none;">Leave Game</button>
-            <button id="end-game-btn" class="btn-danger" onclick="endGame()" style="display: none;">End Game</button>
+            <button id="leave-game-btn" class="btn-danger display-none">Leave Game</button>
+            <button id="end-game-btn" class="btn-danger display-none">End Game</button>
         </div>
+        <script src="/utils.js"></script>
         <script src="/lobby.js"></script>
     </body>
 </html>
