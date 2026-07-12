@@ -31,6 +31,10 @@ body {
     -webkit-tap-highlight-color: transparent; /* Removes default blue tap box on mobile Safari/Chrome */
 }
 
+main {
+    margin-top: 10vh;
+}
+
 h1 {
     font-size: 1.8rem;
     margin: 16px 0;
@@ -50,6 +54,11 @@ h3 {
     margin-bottom: 8px;
 }
 
+footer {
+    margin-top: 30px;
+    text-align: center;
+}
+
 /* Responsive Cards */
 .card {
     background: var(--card-bg);
@@ -59,6 +68,23 @@ h3 {
     border: 1px solid var(--border);
     margin-bottom: 16px;
     width: 100%;
+}
+
+.options-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px;
+    align-items: end;
+    margin-top: 30px;
+}
+
+.option-card {
+    flex: 1;
+}
+
+.option-card.minimal {
+    flex: 0;
 }
 
 /* Mobile-First Form Control Optimization */
@@ -259,4 +285,8 @@ body[style*="max-width: 950px"],
         padding: 10px 6px;
         font-size: 13px;
     }
+}
+
+.copyright {
+    font-weight: bolder;
 }

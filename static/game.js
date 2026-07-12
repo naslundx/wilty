@@ -1,6 +1,6 @@
 const gameId = localStorage.getItem("game_id");
 const userId = localStorage.getItem("user_id");
-if (!gameId || !userId) window.location.href = "/index.html";
+if (!gameId || !userId) window.location.href = "/";
 
 let currentStatementId = null;
 let interval = setInterval(pollGame, 1000); // Poll faster to update the timer smoothly
@@ -10,7 +10,7 @@ function clearSessionAndRedirect() {
   clearInterval(interval);
   localStorage.removeItem("game_id");
   localStorage.removeItem("user_id");
-  window.location.href = "/index.html";
+  window.location.href = "/";
 }
 
 async function pollGame() {
@@ -26,7 +26,7 @@ async function pollGame() {
 
     if (state.status === "finished") {
       clearInterval(interval);
-      window.location.href = "/finished.html";
+      window.location.href = "/finished";
       return;
     }
 

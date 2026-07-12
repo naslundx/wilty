@@ -20,7 +20,7 @@ async function renderFinals() {
 
 function returnHome() {
   localStorage.clear();
-  window.location.href = "/index.html";
+  window.location.href = "/";
 }
 
 renderFinals();

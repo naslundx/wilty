@@ -4,6 +4,7 @@ if (!gameId || !userId) window.location.href = "/index.html";
 
 document.getElementById("lobby-code-display").innerText = gameId;
 let interval = setInterval(pollLobby, 2000);
+let currentNumberOfPlayers = 1;
 pollLobby();
 
 function clearSessionAndRedirect() {
@@ -35,6 +36,7 @@ async function pollLobby() {
     }
 
     const list = document.getElementById("players-list");
+    currentNumberOfPlayers = state.players.length;
     list.innerHTML = state.players
       .map((p) => `<li>${p.username} ${p.is_creator ? "(Host)" : ""}</li>`)
       .join("");
@@ -56,10 +58,13 @@ async function submitStatement() {
     }),
   });
   input.value = "";
-  alert("Secret successfully indexed into database!");
 }
 
 async function startGame() {
+  if (currentNumberOfPlayers < 2) {
+    alert("You need someone to play with!");
+  }
+
   const categories = [];
   if (document.getElementById("cat-casual").checked) categories.push("Casual");
   if (document.getElementById("cat-work").checked)

@@ -1,6 +1,6 @@
 window.onload = () => {
   if (localStorage.getItem("game_id") && localStorage.getItem("user_id")) {
-    window.location.href = "/lobby.html";
+    window.location.href = "/lobby";
   }
 };
 
@@ -16,7 +16,7 @@ async function createGame() {
   const data = await res.json();
   localStorage.setItem("game_id", data.game_id);
   localStorage.setItem("user_id", data.user_id);
-  window.location.href = "/lobby.html";
+  window.location.href = "/lobby";
 }
 
 async function joinGame() {
@@ -38,7 +38,7 @@ async function joinGame() {
   const data = await res.json();
   localStorage.setItem("game_id", data.game_id);
   localStorage.setItem("user_id", data.user_id);
-  window.location.href = "/lobby.html";
+  window.location.href = "/lobby";
 }
 
 function validateRoomCode() {

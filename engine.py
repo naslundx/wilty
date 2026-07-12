@@ -5,6 +5,7 @@ import string
 import time
 import config
 
+
 class GameEngine:
     def __init__(self):
         self.db_is_new = not os.path.exists(config.DB_FILE)
@@ -32,28 +33,40 @@ class GameEngine:
         chars = string.ascii_uppercase + string.digits
         cursor = self.get_cursor()
         while True:
-            code = ''.join(random.choices(chars, k=config.ROOM_CODE_LENGTH))
+            code = "".join(random.choices(chars, k=config.ROOM_CODE_LENGTH))
             cursor.execute("SELECT id FROM games WHERE id = ?", (code,))
             if not cursor.fetchone():
                 return code
 
     def advance_round(self, cursor, game_id: str):
-        cursor.execute("SELECT id FROM users WHERE game_id = ? ORDER BY RANDOM() LIMIT 1", (game_id,))
+        cursor.execute(
+            "SELECT id FROM users WHERE game_id = ? ORDER BY RANDOM() LIMIT 1",
+            (game_id,),
+        )
         storyteller = cursor.fetchone()
 
-        cursor.execute("SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1", (game_id,))
+        cursor.execute(
+            "SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1",
+            (game_id,),
+        )
         statement = cursor.fetchone()
 
         if not statement:
-            cursor.execute("UPDATE statements SET used = 0 WHERE game_id = ?", (game_id,))
-            cursor.execute("SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1", (game_id,))
+            cursor.execute(
+                "UPDATE statements SET used = 0 WHERE game_id = ?", (game_id,)
+            )
+            cursor.execute(
+                "SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1",
+                (game_id,),
+            )
             statement = cursor.fetchone()
 
         if storyteller and statement:
             cursor.execute(
                 "UPDATE games SET current_storyteller_id = ?, current_statement_id = ?, round_started_at = ? WHERE id = ?",
-                (storyteller['id'], statement['id'], time.time(), game_id)
+                (storyteller["id"], statement["id"], time.time(), game_id),
             )
             cursor.execute("DELETE FROM votes WHERE game_id = ?", (game_id,))
+
 
 engine = GameEngine()

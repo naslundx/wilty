@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Waiting Room</title>
+        <title>Would You Lie to Me? - Lobby</title>
         <link rel="stylesheet" href="/style.css" />
     </head>
     <body>
@@ -18,16 +18,16 @@
         </div>
 
         <div class="card">
-            <h3>Submit Your Truth Secrets</h3>
+            <h3>Add your own statements</h3>
             <p style="font-size: 14px; color: #64748b">
-                These are linked to this game session and will always be
-                included.
+                These are linked to this specific game and may be randomly
+                chosen.
             </p>
             <div class="flex-group">
                 <input
                     type="text"
                     id="statement-input"
-                    placeholder="e.g., I have a third cousin who is a rockstar."
+                    placeholder="e.g., I once used AI to make this game."
                 />
                 <button
                     onclick="submitStatement()"
@@ -72,7 +72,7 @@
                 onclick="startGame()"
                 style="background-color: var(--success)"
             >
-                Launch Game Loop
+                Start!
             </button>
         </div>
 
