@@ -96,12 +96,15 @@ async function pollLobby() {
         const scoreInput = document.getElementById("win-score");
         const roundsInput = document.getElementById("max-rounds");
 
-        if (document.activeElement !== timeInput)
-          {timeInput.value = state.max_time_limit;}
-        if (document.activeElement !== scoreInput)
-          {scoreInput.value = state.win_score;}
-        if (document.activeElement !== roundsInput)
-          {roundsInput.value = state.max_rounds || "";}
+        if (document.activeElement !== timeInput) {
+          timeInput.value = state.max_time_limit;
+        }
+        if (document.activeElement !== scoreInput) {
+          scoreInput.value = state.win_score;
+        }
+        if (document.activeElement !== roundsInput) {
+          roundsInput.value = state.max_rounds || "";
+        }
 
         document
           .getElementById("end-game-btn")

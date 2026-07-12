@@ -20,19 +20,19 @@ FAILED=0
 echo -e "\n--- [Python] Checking Linting & Styling ---"
 if [ "$FIX_MODE" = true ]; then
     echo "Running Ruff linter with --fix..."
-    uvx ruff check --fix .
+    uv run ruff check --fix .
     RUFF_LINT_EXIT=$?
 
     echo "Running Ruff formatter..."
-    uvx ruff format .
+    uv run ruff format .
     RUFF_FMT_EXIT=$?
 else
     echo "Checking Ruff linter..."
-    uvx ruff check .
+    uv run ruff check .
     RUFF_LINT_EXIT=$?
 
     echo "Checking Ruff formatter..."
-    uvx ruff format --check .
+    uv run ruff format --check .
     RUFF_FMT_EXIT=$?
 fi
 

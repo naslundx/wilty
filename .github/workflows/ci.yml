@@ -28,7 +28,9 @@ jobs:
         uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990
 
       - name: Run Linting Script
-        run: ./lint.sh
+        run: |
+          npm install
+          ./lint.sh
 
   deploy:
     name: Deploy to Heroku
