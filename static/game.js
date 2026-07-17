@@ -95,6 +95,22 @@ async function pollGame() {
         .classList.remove("display-block");
       document.getElementById("guesser-controls").classList.add("display-none");
 
+      const prepRegion = document.getElementById("storyteller-prep-region");
+      const resolveRegion = document.getElementById(
+        "storyteller-resolve-region",
+      );
+      if (state.elapsed < 5) {
+        prepRegion.classList.remove("display-none");
+        prepRegion.classList.add("display-block");
+        resolveRegion.classList.add("display-none");
+        resolveRegion.classList.remove("display-flex");
+      } else {
+        prepRegion.classList.add("display-none");
+        prepRegion.classList.remove("display-block");
+        resolveRegion.classList.remove("display-none");
+        resolveRegion.classList.add("display-flex");
+      }
+
       // Check resolve condition rules (all voted OR timer out)
       const canResolve =
         state.total_votes >= totalGuessers ||
@@ -238,6 +254,11 @@ if (voteFalseBtn) {
   voteFalseBtn.addEventListener("click", () => submitVote(false));
 }
 
+const skipBtn = document.getElementById("skip-statement-btn");
+if (skipBtn) {
+  skipBtn.addEventListener("click", skipStatement);
+}
+
 const leaveGameBtn = document.getElementById("leave-game-btn");
 if (leaveGameBtn) {
   leaveGameBtn.addEventListener("click", leaveGame);
@@ -297,7 +318,16 @@ async function submitVote(val) {
   pollGame();
 }
 
-async function ratePrompt(type) {
+async function skipStatement() {
+  await fetch("/api/game/skip", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ game_id: gameId, user_id: userId }),
+  });
+  pollGame();
+}
+
+async function ratePrompt(rating) {
   if (!currentStatementId) {
     return;
   }
@@ -307,7 +337,7 @@ async function ratePrompt(type) {
     body: JSON.stringify({
       statement_id: currentStatementId,
       user_id: userId,
-      rating: type,
+      rating: rating,
     }),
   });
   if (res.ok) {

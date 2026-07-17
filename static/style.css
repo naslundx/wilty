@@ -1,12 +1,33 @@
 :root {
     --bg-primary: #f8fafc;
     --card-bg: #ffffff;
-    --text-main: #1e293b;
-    --accent: #4f46e5;
-    --accent-hover: #4338ca;
+    --text-main: #0f172a;
+    --accent: #6366f1; /* Changed to a sleeker indigo */
+    --accent-hover: #4f46e5;
     --success: #10b981;
     --danger: #ef4444;
     --border: #e2e8f0;
+}
+
+.version-badge {
+    font-size: 14px;
+    background-color: var(--accent);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    vertical-align: middle;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.changelog-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.changelog-link:hover {
+    text-decoration: underline;
 }
 
 /* Base resets adjusted for mobile viewport boundaries */
@@ -24,15 +45,24 @@ body {
         sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-main);
-    max-width: 650px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 16px; /* Reduced padding for compact mobile edge screens */
-    line-height: 1.5;
-    -webkit-tap-highlight-color: transparent; /* Removes default blue tap box on mobile Safari/Chrome */
+    padding: 16px;
+    line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.changelog-list {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.changelog-list li {
+    margin-bottom: 12px;
 }
 
 main {
-    margin-top: 10vh;
+    margin-top: 5vh; /* slightly reduced for mobile sleekness */
 }
 
 h1 {

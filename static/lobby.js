@@ -203,6 +203,9 @@ async function updateSettings() {
 
 async function submitStatement() {
   const input = document.getElementById("statement-input");
+  const personalCheckbox = document.getElementById(
+    "statement-personal-checkbox",
+  );
   const text = input.value.trim();
   if (!text) {
     return;
@@ -214,6 +217,7 @@ async function submitStatement() {
       game_id: gameId,
       user_id: userId,
       text: text,
+      is_personal: personalCheckbox.checked,
     }),
   });
   input.value = "";

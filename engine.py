@@ -36,6 +36,17 @@ class GameEngine:
                 cursor.execute(f"ALTER TABLE games ADD COLUMN {col_name} {col_type}")
             except sqlite3.OperationalError:
                 pass
+
+        for col_name, col_type in [
+            ("is_personal", "BOOLEAN DEFAULT 1"),
+        ]:
+            try:
+                cursor.execute(
+                    f"ALTER TABLE statements ADD COLUMN {col_name} {col_type}"
+                )
+            except sqlite3.OperationalError:
+                pass
+
         try:
             cursor.execute("ALTER TABLE users ADD COLUMN has_left BOOLEAN DEFAULT 0")
         except sqlite3.OperationalError:
@@ -65,9 +76,12 @@ class GameEngine:
         )
         storyteller = cursor.fetchone()
 
+        if not storyteller:
+            return
+
         cursor.execute(
-            "SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1",
-            (game_id,),
+            "SELECT id FROM statements WHERE game_id = ? AND used = 0 AND (user_id IS NULL OR is_personal = 0 OR user_id = ?) ORDER BY RANDOM() LIMIT 1",
+            (game_id, storyteller["id"]),
         )
         statement = cursor.fetchone()
 
@@ -76,8 +90,8 @@ class GameEngine:
                 "UPDATE statements SET used = 0 WHERE game_id = ?", (game_id,)
             )
             cursor.execute(
-                "SELECT id FROM statements WHERE game_id = ? AND used = 0 ORDER BY RANDOM() LIMIT 1",
-                (game_id,),
+                "SELECT id FROM statements WHERE game_id = ? AND used = 0 AND (user_id IS NULL OR is_personal = 0 OR user_id = ?) ORDER BY RANDOM() LIMIT 1",
+                (game_id, storyteller["id"]),
             )
             statement = cursor.fetchone()
 

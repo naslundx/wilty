@@ -95,7 +95,7 @@ function renderStatementsTable(statements) {
     .map((s) => {
       const scopeText = s.game_id ? `Room: ${s.game_id}` : "Global Preset";
       const originBadge = s.game_id
-        ? `<span class="badge badge-user">User</span>`
+        ? `<span class="badge badge-user">User ${s.is_personal ? "(Personal)" : "(Party)"}</span>`
         : `<span class="badge badge-system">${s.category}</span>`;
 
       const ups = s.upvotes || 0;
@@ -114,6 +114,7 @@ function renderStatementsTable(statements) {
                 </td>
                 <td>
                     <div class="display-flex gap-6">
+                        ${s.game_id ? `<button data-action="make-global" data-id="${s.id}" class="bg-primary width-auto padding-6-10 font-size-13" title="Make Global"><i class="fa fa-globe"></i></button>` : ""}
                         <button data-action="edit" data-id="${s.id}" class="bg-indigo-500 width-auto padding-6-10 font-size-13"><i class="fa fa-pencil"></i></button>
                         <button data-action="delete" data-id="${s.id}" class="bg-danger width-auto padding-6-10 font-size-13"><i class="fa fa-trash"></i></button>
                     </div>
@@ -131,8 +132,48 @@ function renderStatementsTable(statements) {
       btn.addEventListener("click", () => editStatementById(id));
     } else if (action === "delete") {
       btn.addEventListener("click", () => deleteStatement(id));
+    } else if (action === "make-global") {
+      btn.addEventListener("click", () => makeStatementGlobal(id));
     }
   });
+}
+
+function makeStatementGlobal(id) {
+  const s = statementsData.find((item) => item.id === id);
+  if (!s) {
+    return;
+  }
+
+  const newCategory = window.prompt(
+    "Enter a suitable category for this global statement (e.g., Casual, Work & School, Adult):",
+    "Casual",
+  );
+  if (!newCategory) {
+    return; // User cancelled
+  }
+
+  fetch("/api/admin/statement", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: s.text,
+      category: newCategory,
+      game_id: null,
+      used: false,
+    }),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.detail || "Error making statement global.");
+      } else {
+        alert("Added to global directory successfully.");
+        loadDashboardData();
+      }
+    })
+    .catch(() => {
+      alert("Network error.");
+    });
 }
 
 function showAddForm() {

@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS statements (
     text TEXT,
     category TEXT, -- 'Casual', 'Work & School', 'Adult'
     used BOOLEAN DEFAULT 0,
+    is_personal BOOLEAN DEFAULT 1,
     FOREIGN KEY(game_id) REFERENCES games(id) ON DELETE CASCADE,
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );

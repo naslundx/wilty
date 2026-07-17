@@ -80,17 +80,20 @@
                 cross-examination finishes and conditions are met, reveal
                 reality:
             </p>
-            <div class="flex-group">
+            <div id="storyteller-prep-region" class="margin-bottom-10 text-center display-none">
+                <button id="skip-statement-btn" class="bg-indigo-500 font-size-14 padding-10-20 width-auto">I can't riff on this! Skip & Get New Prompt</button>
+            </div>
+            <div class="flex-group" id="storyteller-resolve-region">
                 <button
                     id="resolve-true-btn"
                     class="bg-success"
-                ></button>
+                >
                     I Told The Truth
                 </button>
                 <button
                     id="resolve-false-btn"
                     class="bg-danger"
-                ></button>
+                >
                     I Was Lying!
                 </button>
             </div>

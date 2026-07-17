@@ -47,6 +47,12 @@ class StatementReq(BaseModel):
     game_id: str
     user_id: str
     text: str
+    is_personal: bool = True
+
+
+class SkipReq(BaseModel):
+    game_id: str
+    user_id: str
 
 
 class StartGameReq(BaseModel):
@@ -227,11 +233,60 @@ def add_statement(req: StatementReq):
     get_user_or_404(cursor, req.game_id, req.user_id)
 
     cursor.execute(
-        "INSERT INTO statements (game_id, user_id, text, category) VALUES (?, ?, ?, 'User')",
-        (req.game_id, req.user_id, req.text),
+        "INSERT INTO statements (game_id, user_id, text, category, is_personal) VALUES (?, ?, ?, 'User', ?)",
+        (req.game_id, req.user_id, req.text, req.is_personal),
     )
     engine.commit()
     return {"status": "success"}
+
+
+@app.post("/api/game/skip")
+def skip_statement(req: SkipReq):
+    cursor = engine.get_cursor()
+    game = get_game_or_404(cursor, req.game_id)
+    if game["status"] != "playing":
+        raise HTTPException(status_code=400, detail="Cannot skip when not playing.")
+    if game["current_storyteller_id"] != req.user_id:
+        raise HTTPException(status_code=400, detail="Only the storyteller can skip.")
+
+    # Allow skip only during the prep time
+    elapsed = time.time() - game["round_started_at"]
+    if elapsed >= config.PREP_TIME_LIMIT:
+        raise HTTPException(
+            status_code=400, detail="Too late to skip. Preparation time is over."
+        )
+
+    # Mark the current one as used so it won't appear again soon
+    cursor.execute(
+        "UPDATE statements SET used = 1 WHERE id = ?", (game["current_statement_id"],)
+    )
+
+    # Re-draw a new statement
+    cursor.execute(
+        "SELECT id FROM statements WHERE game_id = ? AND used = 0 AND (user_id IS NULL OR is_personal = 0 OR user_id = ?) ORDER BY RANDOM() LIMIT 1",
+        (req.game_id, req.user_id),
+    )
+    statement = cursor.fetchone()
+
+    if not statement:
+        # If no other statements available, reset used flags and try again
+        cursor.execute(
+            "UPDATE statements SET used = 0 WHERE game_id = ?", (req.game_id,)
+        )
+        cursor.execute(
+            "SELECT id FROM statements WHERE game_id = ? AND used = 0 AND (user_id IS NULL OR is_personal = 0 OR user_id = ?) ORDER BY RANDOM() LIMIT 1",
+            (req.game_id, req.user_id),
+        )
+        statement = cursor.fetchone()
+
+    if statement:
+        cursor.execute(
+            "UPDATE games SET current_statement_id = ?, round_started_at = ? WHERE id = ?",
+            (statement["id"], time.time(), req.game_id),
+        )
+        engine.commit()
+
+    return {"status": "skipped"}
 
 
 @app.post("/api/game/start")
@@ -493,7 +548,7 @@ def get_admin_dashboard():
     users = [dict(row) for row in cursor.fetchall()]
 
     cursor.execute("""
-        SELECT s.id, s.game_id, s.user_id, s.text, s.category, s.used,
+        SELECT s.id, s.game_id, s.user_id, s.text, s.category, s.used, s.is_personal,
                SUM(CASE WHEN pr.rating = 'up' THEN 1 ELSE 0 END) as upvotes,
                SUM(CASE WHEN pr.rating = 'down' THEN 1 ELSE 0 END) as downvotes
         FROM statements s
