@@ -128,5 +128,14 @@ function validateRoomCode() {
   input.value = input.value.toUpperCase(); // Force the actual input value to uppercase!
   const btn = document.getElementById("join-btn");
   const val = input.value.trim();
-  btn.disabled = !/^([A-Z0-9]{5})$/.test(val);
+  const isValid = /^([A-Z0-9]{5})$/.test(val);
+  btn.disabled = !isValid;
+
+  if (isValid) {
+    btn.classList.remove("secondary");
+    btn.classList.add("primary");
+  } else {
+    btn.classList.remove("primary");
+    btn.classList.add("secondary");
+  }
 }

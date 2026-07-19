@@ -1,125 +1,119 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Would You Lie to Me? - Active Game</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-        <link rel="stylesheet" href="/style.css" />
-    </head>
-    <body>
-        <div id="game-timer" class="timer-banner"><i class="fa fa-clock-o"></i> Time Remaining: --s</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Would You Lie to Me? - Active Game</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="game-timer" class="timer-banner">
+      <i class="fa fa-clock-o"></i> Time Remaining: --s
+    </div>
 
-        <div class="card bg-indigo-100 text-center">
-            <h3 id="storyteller-banner" class="margin-0 text-color-accent">
-                Synchronizing active storyteller...
-            </h3>
-        </div>
+    <div class="card bg-indigo-100 text-center">
+      <h3 id="storyteller-banner" class="margin-0 text-color-accent">
+        Synchronizing active storyteller...
+      </h3>
+    </div>
 
-        <div class="card text-center padding-40-20 position-relative">
-            <h2 id="statement-display" class="font-style-italic">
-                "Loading content..."
-            </h2>
+    <div class="card text-center padding-40-20 position-relative">
+      <h2 id="statement-display" class="font-style-italic">
+        "Loading content..."
+      </h2>
 
-            <!-- Optional Prompt Utility Feedback Row -->
-            <div
-                id="prompt-rating-region"
-                class="margin-top-25 display-none"
-            >
-                <p class="font-size-12 text-muted margin-bottom-5">
-                    Rate this prompt option:
-                </p>
-                <div class="display-inline-flex gap-10">
-                    <button
-                        id="rate-up-btn"
-                        class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
-                        title="Thumbs Up"
-                    >
-                        <i class="fa fa-thumbs-up"></i>
-                    </button>
-                    <button
-                        id="rate-down-btn"
-                        class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
-                        title="Thumbs Down"
-                    >
-                        <i class="fa fa-thumbs-down"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Guesser Controls Interface -->
-        <div id="guesser-controls" class="card display-none">
-            <h3 class="margin-0">Cast Your Verdict</h3>
-            <div class="flex-group">
-                <button
-                    id="vote-true-btn"
-                    class="bg-success"
-                >
-                    Truth
-                </button>
-                <button
-                    id="vote-false-btn"
-                    class="bg-danger"
-                >
-                    Lie
-                </button>
-            </div>
-        </div>
-
-        <!-- Storyteller Evaluation Interface -->
-        <div
-            id="storyteller-controls"
-            class="card display-none border-2-solid-accent"
+      <div
+        id="storyteller-prep-region"
+        class="margin-top-15 margin-bottom-10 text-center display-none"
+      >
+        <button
+          id="skip-statement-btn"
+          class="bg-indigo-500 font-size-14 padding-10-20 width-auto"
         >
-            <h3 class="margin-0 text-color-accent">
-                You are the Storyteller!
-            </h3>
-            <p>
-                Defend the statement above under questioning. Once
-                cross-examination finishes and conditions are met, reveal
-                reality:
-            </p>
-            <div id="storyteller-prep-region" class="margin-bottom-10 text-center display-none">
-                <button id="skip-statement-btn" class="bg-indigo-500 font-size-14 padding-10-20 width-auto">I can't riff on this! Skip & Get New Prompt</button>
-            </div>
-            <div class="flex-group" id="storyteller-resolve-region">
-                <button
-                    id="resolve-true-btn"
-                    class="bg-success"
-                >
-                    I Told The Truth
-                </button>
-                <button
-                    id="resolve-false-btn"
-                    class="bg-danger"
-                >
-                    I Was Lying!
-                </button>
-            </div>
-            <p
-                id="storyteller-lock-notice"
-                class="font-size-12 text-color-red margin-top-10 font-weight-600 text-center"
-            ></p>
-        </div>
+          I can't riff on this! Skip & Get New Prompt
+        </button>
+      </div>
 
-        <div class="card">
-            <p
-                id="vote-summary"
-                class="font-weight-600 text-center text-color-slate-600"
-            ></p>
-            <div id="leaderboard-region">
-                <h3 id="leaderboard-title">Live Leaderboard (First to 5 wins)</h3>
-                <table id="score-table"></table>
-            </div>
+      <!-- Optional Prompt Utility Feedback Row -->
+      <div id="prompt-rating-region" class="margin-top-25 display-none">
+        <p class="font-size-12 text-muted margin-bottom-5">
+          Rate this prompt option:
+        </p>
+        <div class="display-inline-flex gap-10">
+          <button
+            id="rate-up-btn"
+            class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
+            title="Thumbs Up"
+          >
+            <i class="fa fa-thumbs-up"></i>
+          </button>
+          <button
+            id="rate-down-btn"
+            class="width-auto padding-8-16 font-size-16 bg-gray-100 text-color-slate-600 border-1-solid-slate-300 shadow-none"
+            title="Thumbs Down"
+          >
+            <i class="fa fa-thumbs-down"></i>
+          </button>
         </div>
+      </div>
+    </div>
 
-        <div class="card">
-            <h3>Session Controls</h3>
-            <button id="leave-game-btn" class="btn-danger display-none">Leave Game</button>
-            <button id="end-game-btn" class="btn-danger display-none">End Game</button>
-        </div>
-        <script src="/utils.js"></script>
-        <script src="/game.js"></script>
-    </body>
+    <!-- Guesser Controls Interface -->
+    <div id="guesser-controls" class="card display-none">
+      <h3 class="margin-0">Cast Your Verdict</h3>
+      <div class="flex-group">
+        <button id="vote-true-btn" class="bg-success">Truth</button>
+        <button id="vote-false-btn" class="bg-danger">Lie</button>
+      </div>
+    </div>
+
+    <!-- Storyteller Evaluation Interface -->
+    <div
+      id="storyteller-controls"
+      class="card display-none border-2-solid-accent"
+    >
+      <h3 class="margin-0 text-color-accent">You are the Storyteller!</h3>
+      <p>
+        Defend the statement above under questioning. Once cross-examination
+        finishes and conditions are met, reveal reality:
+      </p>
+      <div class="flex-group" id="storyteller-resolve-region">
+        <button id="resolve-true-btn" class="bg-success">
+          I Told The Truth
+        </button>
+        <button id="resolve-false-btn" class="bg-danger">I Was Lying!</button>
+      </div>
+      <p
+        id="storyteller-lock-notice"
+        class="font-size-12 text-color-red margin-top-10 font-weight-600 text-center"
+      ></p>
+    </div>
+
+    <div class="card">
+      <p
+        id="vote-summary"
+        class="font-weight-600 text-center text-color-slate-600"
+      ></p>
+      <div id="leaderboard-region">
+        <h3 id="leaderboard-title">Live Leaderboard (First to 5 wins)</h3>
+        <table id="score-table"></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Session Controls</h3>
+      <button id="leave-game-btn" class="btn-danger display-none">
+        Leave Game
+      </button>
+      <button id="end-game-btn" class="btn-danger display-none">
+        End Game
+      </button>
+    </div>
+    <script src="/utils.js"></script>
+    <script src="/game.js"></script>
+  </body>
 </html>
