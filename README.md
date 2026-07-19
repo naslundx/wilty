@@ -123,3 +123,4 @@ Below are suggested enhancements to the "Would You Lie to Me?" engine, categoriz
 | **Room Access Controls** | Low-Medium | ⭐⭐⭐ | Implement optional room passwords and "Kick Player" functionality for the host to manage public-facing sessions. |
 | **Theme Engine (Dark Mode)** | Low | ⭐⭐ | Expand the CSS utility system to support a "Dark Mode" toggle or custom room color schemes based on the host's preference. |
 | **Avatar System** | Medium | ⭐⭐ | Allow players to select or generate simple avatars (e.g., via DiceBear) to make the leaderboard more visually engaging. |
+| **Database** | High | * | Move to a postgres DB for persistence. |

@@ -285,6 +285,10 @@ button:disabled {
     transform: translateX(-50%) translateY(0);
 }
 
+.alert-banner.success {
+    background-color: var(--success);
+}
+
 /* Responsive Tables & Scoreboards */
 table {
     width: 100%;

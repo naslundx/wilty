@@ -167,7 +167,7 @@ function makeStatementGlobal(id) {
         const err = await res.json();
         alert(err.detail || "Error making statement global.");
       } else {
-        alert("Added to global directory successfully.");
+        alert("Added to global directory successfully.", "success");
         loadDashboardData();
       }
     })
@@ -251,7 +251,7 @@ async function saveStatement(event) {
 
     cancelStatementForm();
     await loadDashboardData();
-    alert("Statement asset successfully saved!");
+    alert("Statement asset successfully saved!", "success");
   } catch (err) {
     console.error(err);
     alert("Error communicating with server.");
@@ -274,7 +274,7 @@ async function deleteStatement(id) {
       }
 
       await loadDashboardData();
-      alert("Statement asset successfully deleted!");
+      alert("Statement asset successfully deleted!", "success");
     } catch (err) {
       console.error(err);
       alert("Error communicating with server.");

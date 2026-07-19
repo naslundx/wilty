@@ -189,7 +189,7 @@ async function updateSettings() {
       }),
     });
     if (res.ok) {
-      alert("Settings updated successfully!");
+      alert("Settings updated successfully!", "success");
     } else {
       alert((await res.json()).detail);
     }
@@ -221,7 +221,10 @@ async function submitStatement() {
     }),
   });
   input.value = "";
-  alert("Secret statement successfully added to your room's custom pool!");
+  alert(
+    "Secret statement successfully added to your room's custom pool!",
+    "success",
+  );
 }
 
 async function startGame() {

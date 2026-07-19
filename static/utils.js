@@ -3,7 +3,7 @@ window.gameId = localStorage.getItem("game_id");
 window.userId = localStorage.getItem("user_id");
 
 // Beautiful custom alert override that uses a modal/banner at the top of the viewport
-window.alert = function (message) {
+window.alert = function (message, type = "error") {
   const existing = document.getElementById("app-alert-banner");
   if (existing) {
     existing.remove();
@@ -12,6 +12,9 @@ window.alert = function (message) {
   const banner = document.createElement("div");
   banner.id = "app-alert-banner";
   banner.className = "alert-banner";
+  if (type === "success") {
+    banner.classList.add("success");
+  }
   banner.innerText = message;
 
   document.body.appendChild(banner);
