@@ -6,8 +6,11 @@
     <title>Would You Lie to Me? - Join Game</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
-  <body class="landing-page">
-    <main class="glass-panel">
+  <body class="center-content">
+    <main
+      class="card"
+      style="max-width: 480px; margin: 0 auto; text-align: center"
+    >
       <h1>Would You Lie to Me? <span class="version-badge">v0.2</span></h1>
       <p class="text-center font-size-14 text-muted margin-bottom-20">
         <a href="/changelog.html" class="changelog-link">What's New in v0.2?</a>
@@ -15,34 +18,32 @@
       <input
         type="text"
         id="username-input"
-        class="glass-input nickname-input"
+        class="nickname-input"
         placeholder="Enter Nickname"
       />
 
-      <div class="glass-options-row">
-        <div class="glass-option-card">
-          <button id="create-game-btn" class="glass-btn primary">
-            Create New Room
-          </button>
+      <div class="options-row">
+        <div class="option-card">
+          <button id="create-game-btn">Create New Room</button>
         </div>
-        <div class="glass-divider">
+        <div class="option-divider">
           <span>OR</span>
         </div>
-        <div class="glass-option-card">
+        <div class="option-card">
           <input
             type="text"
             id="game-id-input"
             maxlength="5"
-            placeholder="ABCDE"
-            class="glass-input text-center text-transform-uppercase"
+            placeholder="5-character Room Code"
+            class="text-center text-transform-uppercase"
           />
-          <button class="glass-btn secondary" id="join-btn" disabled>
+          <button class="btn-alt" id="join-btn" disabled>
             Join Existing Room
           </button>
         </div>
       </div>
     </main>
-    <footer class="glass-footer">
+    <footer>
       <div class="about-text">
         A party game of truth, lies, and deduction.<br />
         Gather your friends and see who can spot the fib!

@@ -132,10 +132,8 @@ function validateRoomCode() {
   btn.disabled = !isValid;
 
   if (isValid) {
-    btn.classList.remove("secondary");
-    btn.classList.add("primary");
+    btn.classList.remove("btn-alt");
   } else {
-    btn.classList.remove("primary");
-    btn.classList.add("secondary");
+    btn.classList.add("btn-alt");
   }
 }
